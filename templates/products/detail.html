@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}商品詳細{% endblock %}
+{% block content %}
+{% load static %}
+
+<body>
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+      <a class="navbar-brand" href="{% url "products:index" %}">野球魂</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url "products:index" %}">ホーム</a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#!">私たちについて</a></li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              id="navbarDropdown"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              >商品</a
+            >
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url "products:index" %}">商品一覧</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="#!">人気商品</a></li>
+              <li><a class="dropdown-item" href="#!">新作商品</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <button class="btn btn-outline-dark" type="submit">
+            <i class="bi-cart-fill me-1"></i>
+            カート
+            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  <!-- Product section-->
+  <section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+      <div class="row gx-4 gx-lg-5 align-items-center">
+        <div class="col-md-6">
+          {% if product_detail.image %}
+          <img
+            class="card-img-top"
+            src="{{ product_detail.image.url }}"
+            alt="{{ product_detail.name }}"
+          />
+          {% else %}
+          <img
+            class="card-img-top mb-5 mb-md-0"
+            src="https://dummyimage.com/600x700/dee2e6/6c757d.jpg"
+            alt="{{ product_detail.name }}"
+          />
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          <h1 class="display-5 fw-bolder">{{ product_detail.name }}</h1>
+          <div class="fs-5 mb-5">
+            <span class="">&#0165; {{ product_detail.price }}</span>
+          </div>
+          <p class="lead">{{ product_detail.description }}</p>
+          <div class="d-flex">
+            <input
+              class="form-control text-center me-3"
+              id="inputQuantity"
+              type="num"
+              value="1"
+              style="max-width: 3rem"
+            />
+            <button class="btn btn-outline-dark flex-shrink-0" type="button">
+              <i class="bi-cart-fill me-1"></i>
+              Add to cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% include "products/related.html" %}
+  <!-- Footer-->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">
+        Copyright &copy; Your Website 2023
+      </p>
+    </div>
+  </footer>
+</body>
+{% endblock content %}
