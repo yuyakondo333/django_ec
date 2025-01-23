@@ -6,6 +6,10 @@ class Product(models.Model):
     class Meta:
         # テーブル名を定義
         db_table = 'product'
+        # モデル名の日本語化 /adminのサイドバーの出力
+        verbose_name = '商品'
+        # 表示の乱れをなくす
+        verbose_name_plural = '商品'
 
     # テーブルのカラムに対応するフィールドを定義
     name = models.CharField(verbose_name='商品名', max_length=255, unique=True)
