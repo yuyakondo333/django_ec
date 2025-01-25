@@ -33,7 +33,9 @@ class AdminProductCreateView(CreateView):
 
 
 class AdminProductDetailView(DetailView):
-    pass
+    model = Product
+    template_name = "admin/products/detail.html"
+    context_object_name = "product_detail"
 
 
 class AdminProductUpdateView(UpdateView):
