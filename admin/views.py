@@ -1,21 +1,25 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .forms import LoginForm
 
 # Create your views here.
 
-class AdminLoginView():
-    pass
+class AdminLogin(LoginView):
+    # テンプレートを選択
+    template_name = 'admin/auth/login.html'
+    form_class = LoginForm
 
 
-class AdminLogoutView():
-    pass
+class AdminLogout(LogoutView):
+    # リダイレクトでログインURLに飛ばす
+    template_name = 'admin/auth/logout.html'
 
 
 class AdminProductIndexView(ListView):
-    pass
+    template_name = 'admin/products/index.html'
 
 
 class AdminProductCreateView(CreateView):
