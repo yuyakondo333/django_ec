@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import LoginForm
+from products.models import Product
 
 # Create your views here.
 
@@ -19,7 +20,12 @@ class AdminLogout(LogoutView):
 
 
 class AdminProductIndexView(ListView):
+    model = Product
     template_name = 'admin/products/index.html'
+    context_object_name = "product_list"
+
+    def get_queryset(self):
+        return Product.objects.all()
 
 
 class AdminProductCreateView(CreateView):
