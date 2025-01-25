@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}管理画面ログイン{% endblock %}
+{% block content %}
+{% load static %}
+<body class="container mt-5">
+    <h1 class="text-center mb-4">商品削除確認</h1>
+
+    <div class="card p-4 shadow">
+        <!-- 商品名の出力 -->
+        <div class="mb-3">
+            <h5 class="text-muted">削除対象の商品名:</h5>
+            <p class="fs-4">{{ product.name }}</p>
+        </div>
+
+        <!-- 削除確認フォーム -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+                <!-- 削除確定ボタン -->
+                <button type="submit" class="btn btn-danger px-5">削除する</button>
+                <!-- 戻るボタン -->
+                <a href="{% url 'admin:product_index' %}" class="btn btn-secondary px-5">戻る</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+{% endblock %}

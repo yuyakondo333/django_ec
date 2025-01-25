@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -34,8 +35,8 @@ class AdminProductCreateView(CreateView):
 
 class AdminProductDetailView(DetailView):
     model = Product
-    template_name = "admin/products/detail.html"
-    context_object_name = "product_detail"
+    template_name = 'admin/products/detail.html'
+    context_object_name = 'product_detail'
 
 
 class AdminProductUpdateView(UpdateView):
@@ -43,4 +44,7 @@ class AdminProductUpdateView(UpdateView):
 
 
 class AdminProductDeleteView(DeleteView):
-    pass
+    model = Product
+    template_name = 'admin/products/delete.html'
+    context_object_name = 'product'
+    success_url = reverse_lazy('admin:product_index')
