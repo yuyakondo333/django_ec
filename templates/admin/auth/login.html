@@ -11,14 +11,24 @@
           <div class="card-body p-4 p-sm-5">
             <h5 class="card-title text-center mb-5 fw-light fs-5">管理画面にログイン</h5>
             <form action="" method="POST" class="mt-4">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="form-floating mb-3">
-                {{ field }}  <!-- 入力フィールドを出力 -->
-                {{ field.label_tag }}  <!-- ラベルを出力 -->
-            </div>
-            {% endfor %}
-            <button type="submit" class="btn btn-primary w-100">ログイン</button>
+              {% csrf_token %}
+              <!-- 全体のエラーメッセージを表示 -->
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                </div>
+              {% endif %}
+              <!-- フィールドごとのエラーメッセージを表示 -->
+              {% for field in form %}
+                <div class="form-floating mb-3">
+                  {{ field }}
+                  {{ field.label_tag }}
+                  {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|join:", " }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+              <button type="submit" class="btn btn-primary w-100">ログイン</button>
             </form>
           </div>
         </div>
