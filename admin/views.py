@@ -43,7 +43,11 @@ class AdminProductDetailView(DetailView):
 
 
 class AdminProductUpdateView(UpdateView):
-    pass
+    model = Product
+    form_class = ProductForm
+    template_name = 'admin/products/update.html'
+    context_object_name = 'product'
+    success_url = reverse_lazy('admin:product_index')
 
 
 class AdminProductDeleteView(DeleteView):

@@ -34,8 +34,12 @@
                 <td>
                     <div class="d-flex gap-2">
                         <!-- 商品詳細ボタン -->
-                        <a href="{% url 'admin:product_detail' product.id %}" class="btn btn-primary btn-sm">
+                        <a href="{% url 'admin:product_detail' product.id %}" class="btn btn-secondary btn-sm">
                             詳細
+                        </a>
+                        <!-- 商品編集ボタン -->
+                        <a href="{% url 'admin:product_update' product.id %}" class="btn btn-primary btn-sm">
+                            編集
                         </a>
                         <!-- 商品削除ボタン -->
                         <a href="{% url 'admin:product_delete' product.id %}" class="btn btn-danger btn-sm">
