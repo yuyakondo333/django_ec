@@ -9,6 +9,12 @@
         <form action="{% url 'admin:product_create' %}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
 
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors|join:"<br>" }}
+                </div>
+            {% endif %}
+
             <div class="mb-4">
                 <label for="id_name" class="form-label fw-bold">商品名</label>
                 <input type="text" name="name" class="form-control {% if form.name.errors %}is-invalid{% endif %}" placeholder="商品名を入力してください" {% if form.is_bound %}value="{{ form.name.value }}"{% endif %} required>

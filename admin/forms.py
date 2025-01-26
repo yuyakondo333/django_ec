@@ -26,22 +26,46 @@ class LoginForm(AuthenticationForm):
         return clean_data
 
 
-class ProductRegisterForm(ModelForm):
+class ProductForm(ModelForm):
     # 商品登録画面用のフォーム
     class Meta:
         # 利用するモデルクラスを指定
         model = Product
-        # 利用するモデルのフィールドを指定
-        fields = '__all__'  # モデルの全フィールドを使用
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '商品名を入力してください'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '価格を入力してください'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': '商品説明を入力してください'}),
-        }
-    
+        # 利用するモデルの全フィールドを指定
+        fields = ['name', 'price', 'image', 'description']
+
     def clean_name(self):
         name = self.cleaned_data.get('name')
+        # nameが空だったらバリデーションエラー
         if not name:
             raise ValidationError("商品名を入力してください。")
+        # nameが256文字以上だったらバリデーションエラー
+        if len(name) > 255:
+            raise ValidationError("商品名は255文字以内にしてください")
         return name
+    
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        # priceが空だったらバリデーションエラー
+        if not price:
+            raise ValidationError("価格を入力してください。")
+        # priceが0以下、int型以外だったらバリデーションエラー
+        if price < 0 or type(price) != int:
+            raise ValidationError("価格は1以上の整数を入力してください")
+        return price
+    
+    def clean_description(self):
+        description = self.cleaned_data.get('description')
+        # descriptionが空だったらバリデーションエラー
+        if not description:
+            raise ValidationError("商品名を入力してください。")
+        # descriptionが1001文字以上だったらバリデーションエラー
+        if len(description) > 1000:
+            raise ValidationError("商品説明は1000文字以内にしてください")
+        return description
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        price = cleaned_data.get('price')
+        return cleaned_data
