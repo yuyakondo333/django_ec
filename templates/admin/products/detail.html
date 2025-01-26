@@ -12,7 +12,7 @@
                 <div>
                     <h5 class="text-muted">商品画像</h5>
                     {% if product_detail.image %}
-                        <img src="{{ product_detail.image }}" alt="{{ product_detail.name }}" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                        <img src="{{ product_detail.image.url }}" alt="{{ product_detail.name }}" class="img-fluid rounded" style="max-width: 100%; height: auto;">
                     {% else %}
                         <p class="text-muted">画像はありません。</p>
                     {% endif %}

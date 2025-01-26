@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import LoginForm
+from .forms import LoginForm, ProductRegisterForm
 from products.models import Product
 
 # Create your views here.
@@ -30,7 +30,15 @@ class AdminProductIndexView(ListView):
 
 
 class AdminProductCreateView(CreateView):
-    pass
+    model = Product
+    form_class = ProductRegisterForm
+    template_name = 'admin/products/create.html'
+    success_url = reverse_lazy('admin:product_index')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        print(f"Uploaded image URL: {self.object.image.url}")  # デバッグ用
+        return response
 
 
 class AdminProductDetailView(DetailView):
