@@ -33,7 +33,7 @@ class AdminProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'admin/products/create.html'
-    success_url = reverse_lazy('admin:product_index')
+    success_url = reverse_lazy('custom_admin:product_index')
 
 
 class AdminProductDetailView(DetailView):
@@ -47,11 +47,11 @@ class AdminProductUpdateView(UpdateView):
     form_class = ProductForm
     template_name = 'admin/products/update.html'
     context_object_name = 'product'
-    success_url = reverse_lazy('admin:product_index')
+    success_url = reverse_lazy('custom_admin:product_index')
 
 
 class AdminProductDeleteView(DeleteView):
     model = Product
     template_name = 'admin/products/delete.html'
     context_object_name = 'product'
-    success_url = reverse_lazy('admin:product_index')
+    success_url = reverse_lazy('custom_admin:product_index')

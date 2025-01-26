@@ -6,7 +6,7 @@
     <h1 class="text-center mb-4">商品作成</h1>
 
     <div class="card p-4 shadow">
-        <form action="{% url 'admin:product_create' %}" 
+        <form action="{% url 'custom_admin:product_create' %}" 
                 method="post" 
                 enctype="multipart/form-data" 
                 class="needs-validation" 
@@ -89,7 +89,7 @@
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'admin:product_index' %}" class="btn btn-secondary">戻る</a>
+        <a href="{% url 'custom_admin:product_index' %}" class="btn btn-secondary">戻る</a>
     </div>
 </body>
 {% endblock %}
