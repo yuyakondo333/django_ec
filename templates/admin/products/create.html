@@ -6,7 +6,11 @@
     <h1 class="text-center mb-4">商品作成</h1>
 
     <div class="card p-4 shadow">
-        <form action="{% url 'admin:product_create' %}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'admin:product_create' %}" 
+                method="post" 
+                enctype="multipart/form-data" 
+                class="needs-validation" 
+                novalidate>
             {% csrf_token %}
 
             {% if form.non_field_errors %}
@@ -17,7 +21,13 @@
 
             <div class="mb-4">
                 <label for="id_name" class="form-label fw-bold">商品名</label>
-                <input type="text" name="name" class="form-control {% if form.name.errors %}is-invalid{% endif %}" placeholder="商品名を入力してください" {% if form.is_bound %}value="{{ form.name.value }}"{% endif %} required>
+                <input type="text" 
+                        name="name" 
+                        class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                        placeholder="商品名を入力してください"
+                        {% if form.is_bound %}value="{{ form.name.value }}"{% endif %}
+                        required
+                >
                 {% if form.name.errors %}
                     <div class="invalid-feedback">
                         {{ form.name.errors|join:", " }}
@@ -27,7 +37,14 @@
 
             <div class="mb-4">
                 <label for="id_price" class="form-label fw-bold">価格</label>
-                <input type="number" name="price" class="form-control {% if form.price.errors %}is-invalid{% endif %}" placeholder="価格を入力してください" {% if form.is_bound %}value="{{ form.price.value }}"{% endif %} required>
+                <input type="number"
+                        name="price"
+                        class="form-control
+                        {% if form.price.errors %}is-invalid{% endif %}"
+                        placeholder="価格を入力してください"
+                        {% if form.is_bound %}value="{{ form.price.value }}"{% endif %}
+                        required
+                >
                 {% if form.price.errors %}
                     <div class="invalid-feedback">
                         {{ form.price.errors|join:", " }}
@@ -37,7 +54,12 @@
 
             <div class="mb-4">
                 <label for="id_image" class="form-label fw-bold">商品画像</label>
-                <input type="file" name="image" class="form-control {% if form.image.errors %}is-invalid{% endif %}" {% if form.is_bound %}value="{{ form.image.value }}"{% endif %}>
+                <input type="file"
+                        name="image"
+                        class="form-control
+                        {% if form.image.errors %}is-invalid{% endif %}"
+                        {% if form.is_bound %}value="{{ form.image.value }}"{% endif %}
+                >
                 {% if form.image.errors %}
                     <div class="invalid-feedback">
                         {{ form.image.errors|join:", " }}
@@ -47,7 +69,12 @@
 
             <div class="mb-4">
                 <label for="id_description" class="form-label fw-bold">商品説明</label>
-                <textarea name="description" class="form-control {% if form.description.errors %}is-invalid{% endif %}" rows="4" placeholder="商品説明を入力してください" required>{% if form.is_bound %}{{ form.description.value }}{% endif %}</textarea>
+                <textarea name="description" 
+                            class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
+                            rows="4"
+                            placeholder="商品説明を入力してください"
+                            required
+                >{% if form.is_bound %}{{ form.description.value }}{% endif %}</textarea>
                 {% if form.description.errors %}
                     <div class="invalid-feedback">
                         {{ form.description.errors|join:", " }}
