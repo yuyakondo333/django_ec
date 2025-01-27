@@ -140,3 +140,7 @@ LOGIN_URL = '/admin/login'
 LOGIN_REDIRECT_URL = '/admin/products'
 # 管理画面ログアウト後にリダイレクトされるURLを指定
 LOGOUT_REDIRECT_URL='/admin/login'
+
+MIGRATION_MODULES = {
+    'custom_admin': None,
+}
