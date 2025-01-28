@@ -69,3 +69,4 @@ class ProductForm(ModelForm):
         name = cleaned_data.get('name')
         price = cleaned_data.get('price')
         return cleaned_data
+    
