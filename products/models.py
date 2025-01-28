@@ -10,9 +10,5 @@ class Product(models.Model):
     # テーブルのカラムに対応するフィールドを定義
     name = models.CharField(verbose_name='商品名', max_length=255, unique=True)
     price = models.IntegerField(verbose_name='価格', default=0)
-    image = models.URLField(verbose_name='商品画像', null=True, blank=True)
+    image = models.ImageField(verbose_name='商品画像', max_length=500, null=True, blank=True)
     description = models.TextField(verbose_name='商品説明', max_length=1000)
-
-    # admin画面の表示内容
-    def __str__(self):
-        return self.name

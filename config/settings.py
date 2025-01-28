@@ -24,12 +24,12 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'custom_admin.apps.CustomAdminConfig',
     'products.apps.ProductsConfig',
     'cloudinary',
     'cloudinary_storage',
@@ -132,4 +132,15 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUDINARY_NAME'),
     'API_KEY': env('CLOUDINARY_API_KEY'),
     'API_SECRET': env('CLOUDINARY_API_SECRET'),
+}
+
+# 管理画面へのログインが必要なページで認証していないユーザーがアクセスした場合に、リダイレクト先のURLを指定
+LOGIN_URL = '/admin/login'
+# 管理画面へログインした後にリダイレクトするURLを指定
+LOGIN_REDIRECT_URL = '/admin/products'
+# 管理画面ログアウト後にリダイレクトされるURLを指定
+LOGOUT_REDIRECT_URL='/admin/login'
+
+MIGRATION_MODULES = {
+    'custom_admin': None,
 }

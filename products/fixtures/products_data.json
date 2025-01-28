@@ -6,7 +6,7 @@
         "name": "バット",
         "price": 15000,
         "description": "SSKの硬式用バットです。",
-        "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527928/media/product_images/bat_vzqain.jpg"
+        "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/bat_clwx2n.jpg"
     }
     },
     {
@@ -16,7 +16,7 @@
             "name": "内野手用グローブ",
             "price": 35000,
             "description": "坂本モデル内野手用グローブです。",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527942/media/product_images/globe_v9tldb.jpg"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/globe_ewxpit.jpg"
         }
     },
     {
@@ -26,7 +26,7 @@
             "name": "ボール1ダース",
             "price": 8000,
             "description": "硬式球1ダースです。",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527949/media/product_images/ball_u4lbv3.jpg"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/ball_m8ixvm.jpg"
         }
     },
     {
@@ -36,7 +36,7 @@
             "name": "帽子",
             "price": 5000,
             "description": "野球の帽子です。まずは中日から",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527957/media/product_images/cap_xaeucb.jpg"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/cap_e3xsxy.jpg"
         }
     },
     {
@@ -46,7 +46,7 @@
             "name": "スパイク",
             "price": 15000,
             "description": "白のスパイクです。",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527964/media/product_images/spike_br41ls.webp"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737824893/spike_pdh6f0.webp"
         }
     },
     {
@@ -56,7 +56,7 @@
             "name": "ユニフォーム",
             "price": 10000,
             "description": "野球のユニフォームです。中日ドラゴンズが1番おすすめです。",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527971/media/product_images/uniform_suxbdn.webp"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737824893/uniform_s0swp2.webp"
         }
     },
     {
@@ -66,7 +66,7 @@
             "name": "ホームベース",
             "price": 5000,
             "description": "ホームベースです。地面に書かずに済みます",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737530165/home_base_zmkuzs.jpg"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/home_base_r6egdz.jpg"
         }
     },
     {
@@ -76,7 +76,7 @@
             "name": "ベルト",
             "price": 5000,
             "description": "ベルトです。よく忘れる人がいるので2本買うことをお勧めします。",
-            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737527982/media/product_images/belt_v3fcsj.jpg"
+            "image": "https://res.cloudinary.com/dyfjcfcfm/image/upload/v1737822333/belt_mxz0vv.jpg"
         }
     }
 ]

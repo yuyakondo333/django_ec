@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}商品編集{% endblock %}
+{% block content %}
+{% load static %}
+<body class="container mt-5">
+    <h1 class="text-center mb-4">商品編集</h1>
+
+    <div class="card p-4 shadow">
+        <form action="{% url 'custom_admin:product_update' product.id %}"
+                method="post"
+                enctype="multipart/form-data"
+                class="needs-validation"
+                novalidate
+        >
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors|join:"<br>" }}
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label for="id_name" class="form-label fw-bold">商品名</label>
+                <input type="text"
+                        name="name"
+                        class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                        placeholder="商品名を入力してください"
+                        {% if form.is_bound %}value="{{ form.name.value }}"
+                        {% else %} value="{{ product.name }}" {% endif %}
+                        required
+                >
+                {% if form.name.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.name.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="id_price" class="form-label fw-bold">価格</label>
+                <input type="number" name="price" 
+                        class="form-control {% if form.price.errors %}is-invalid{% endif %}"
+                        placeholder="価格を入力してください"
+                        {% if form.is_bound %}value="{{ form.price.value }}"
+                        {% else %} value="{{ product.price }}" {% endif %}
+                        required
+                >
+                {% if form.price.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.price.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="id_image" class="form-label fw-bold">商品画像</label>
+                <img src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                        class="d-block img-fluid rounded"
+                        style="max-width: 25%; height: auto;"
+                >
+                <input type="file"
+                        name="image"
+                        class="form-control 
+                        {% if form.image.errors %}is-invalid{% endif %}" 
+                        {% if form.is_bound %}value="{{ form.image.value }}"{% else %}{{ product.image }}{% endif %}
+                >
+                {% if form.image.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.image.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label for="id_description" class="form-label fw-bold">商品説明</label>
+                <textarea name="description"
+                            class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
+                            rows="4"
+                            placeholder="商品説明を入力してください"
+                            required
+                >{% if form.is_bound %}{{ form.description.value }}{% else %}{{ product.description}}{% endif %}</textarea>
+                {% if form.description.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.description.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success px-5">保存</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'custom_admin:product_index' %}" class="btn btn-secondary">戻る</a>
+    </div>
+</body>
+{% endblock %}
