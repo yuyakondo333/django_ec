@@ -87,7 +87,10 @@
             <div class="card-body p-4">
               <div class="text-center">
                 <!-- Product name-->
-                <h5 class="fw-bolder">{{ product.name }}</h5>
+                <a class="btn d-block" href="{% url "products:detail" product.id %}"
+                >
+                  <h5 class="fw-bolder">{{ product.name }}</h5>
+                </a>
                 <!-- Product price-->
                 &#0165; {{ product.price }}
               </div>
@@ -96,7 +99,7 @@
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
               <div class="text-center">
                 <a class="btn btn-outline-dark mt-auto" href="{% url "products:detail" product.id %}"
-                  >商品を見る</a
+                  >Add to cart</a
                 >
               </div>
             </div>
