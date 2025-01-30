@@ -83,16 +83,19 @@
           </div>
           <p class="lead">{{ product_detail.description }}</p>
           <div class="d-flex">
-            <input
-              class="form-control text-center me-3"
-              id="inputQuantity"
-              type="num"
-              value="1"
-              style="max-width: 3rem"
-            />
             <form method="post" action="{% url "cart:add_to_cart" product_detail.id %}">
               {% csrf_token %}
-              <button type="submit" class="btn btn-outline-dark mt-auto">
+              <input
+                class="form-control text-center me-3"
+                id="inputQuantity"
+                type="number"
+                name="num"
+                value="1"
+                min="1"
+                step="1"
+                style="max-width: 4rem"
+              />
+              <button type="submit" class="btn btn-outline-dark mt-auto d-inline-block">
                 Add to cart
               </button>
             </form>
