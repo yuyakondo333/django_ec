@@ -30,7 +30,22 @@ class AddToCartView(TemplateView):
             cart_product.quantity += 1
         cart_product.save()
 
+        # 合計個数
+        cart_total = total_cart_products(cart)
+
+        request.session["cart_total"] = cart_total
+
         # カート追加時のメッセージ
         messages.success(request, f'{product.name}をカートに追加しました')
 
         return redirect(request.META.get("HTTP_REFERER", reverse("products:index")))
+    
+def total_cart_products(cart):
+    # 同じカートIDのレコードを取得（filter使用）
+    cart_products = CartProduct.objects.filter(cart=cart)
+
+    # 取得したオブジェクトの合計を計算
+    total_quantiry = sum(cart_product.quantity for cart_product in cart_products)
+
+    # 合計個数をreturn
+    return total_quantiry

@@ -46,7 +46,13 @@
         <a href="{% url "cart:cart_page" %}" class="btn btn-outline-dark">
           <i class="bi-cart-fill me-1"></i>
           カート
-          <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+          <span class="badge bg-dark text-white ms-1 rounded-pill">
+          {% if request.session.cart_total %}
+              {{ request.session.cart_total }}
+          {% else %}
+              0
+          {% endif %}
+          </span>
         </a>
       </div>
     </div>
@@ -84,10 +90,12 @@
               value="1"
               style="max-width: 3rem"
             />
-            <button class="btn btn-outline-dark flex-shrink-0" type="button">
-              <i class="bi-cart-fill me-1"></i>
-              Add to cart
-            </button>
+            <form method="post" action="{% url "cart:add_to_cart" product_detail.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-dark mt-auto">
+                Add to cart
+              </button>
+            </form>
           </div>
         </div>
       </div>
