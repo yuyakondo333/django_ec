@@ -57,6 +57,16 @@
       </div>
     </div>
   </nav>
+  <!-- Message-->
+  {% if messages %}
+  <div class="container mt-3">
+      {% for message in messages %}
+      <div class="messages alert alert-success" role="alert">
+          {{ message }}
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
   <!-- Product section-->
   <section class="py-5">
     <div class="container px-4 px-lg-5 my-5">
