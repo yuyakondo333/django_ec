@@ -116,6 +116,7 @@
               <div class="text-center">
                 <form method="post" action="{% url "cart:add_to_cart" product.id %}">
                   {% csrf_token %}
+                  <input type="hidden" name="num" value="1">
                   <button type="submit" class="btn btn-outline-dark mt-auto">
                     Add to cart
                   </button>

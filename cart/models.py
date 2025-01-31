@@ -3,7 +3,7 @@ from products.models import Product
 
 # Create your models here.
 class Cart(models.Model):
-    session_id = models.CharField(max_length=32, unique=True, null=True, blank=True)
+    session_id = models.CharField(max_length=32, unique=True)
 
     class Meta:
         db_table = 'cart'
