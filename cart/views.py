@@ -20,7 +20,7 @@ class CartPageView(ListView):
         session_id = self.request.session.session_key
         # なければ強制的にセッションIDを作成
         if not session_id:
-            self.request.session_create()
+            self.request.session.create()
             session_id = self.request.session_session_key
         # セッションIDを元にカートオブジェクトを取得
         cart, created = Cart.objects.get_or_create(session_id=session_id)
@@ -59,7 +59,7 @@ class AddToCartView(TemplateView):
         # セッションIDを取得（なければ作成）
         session_id = request.session.session_key
         if not session_id:
-            request.session_create()
+            request.session.create()
             session_id = request.session_session_key
         # カートを作成または取得
         cart, created = Cart.objects.get_or_create(session_id=session_id)
