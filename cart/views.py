@@ -1,14 +1,45 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.urls import reverse
+from collections import defaultdict
+from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.edit import DeleteView
 from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
 
 # Create your views here.
-class CartPageView(TemplateView):
+class CartPageView(ListView):
     template_name = 'cart/cart_page.html'
+    model = CartProduct
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # ECサイトにアクセスしているユーザーのセッションIDを取得
+        session_id = self.request.session.session_key
+        # セッションIDを元にカートオブジェクトを取得（なければ作成）
+        cart, created = Cart.objects.get_or_create(session_id)
+        # カートオブジェクトを元にカートない商品を取得
+        cart_products = CartProduct.objects.filter(cart=cart)
+        # 何種類の商品が追加されたか
+        total_type_products = total_cart_products(cart)
+        # カート内の全商品の合計金額
+        total_cart_amount = sum(cart_product.product.price * cart_product.quantity for cart_product in cart_products)
+        # 商品名ごと辞書で格納（デフォルト0に設定）
+        product_data = defaultdict(lambda: {"total_price": 0, "quantity": 0})
+        # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
+        for cart_product in cart_products:
+            product_name = cart_product.product.name
+            product_data[product_name]["total_price"] += cart_product.product.price * cart_product.quantity
+            product_data[product_name]["id"] = cart_product.id
+            product_data[product_name]["price"] = cart_product.product.price
+            product_data[product_name]["quantity"] += cart_product.quantity
+
+        context["total_type_products"] = total_type_products
+        context["total_cart_amount"] = total_cart_amount
+        context["product_data"] = dict(product_data)
+        return context
 
 
 class AddToCartView(TemplateView):
@@ -71,3 +102,19 @@ def total_cart_products(cart):
 
     # 合計個数をreturn
     return total_quantiry
+
+class DeleteToCartView(DeleteView):
+    template_name = 'cart/delete.html'
+    model = CartProduct
+    context_object_name = 'cart_product'
+    print(context_object_name)
+    success_url = reverse_lazy('cart:cart_page')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        cart_product = self.get_object()
+        context["product_name"] = cart_product.product.name  # 商品名
+        context["quantity"] = cart_product.quantity  # 数量
+
+        return context
