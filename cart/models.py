@@ -23,7 +23,7 @@ class Cart(models.Model):
         return cart
 
 class CartProduct(models.Model):
-    cart = models.ForeignKey("cart.Cart", verbose_name=("カートID"), on_delete=models.CASCADE)
+    cart = models.ForeignKey("cart.Cart", verbose_name=("カートID"), on_delete=models.CASCADE, related_name="cart_products")
     product = models.ForeignKey("products.Product", verbose_name=("商品ID"), on_delete=models.CASCADE)
     quantity = models.IntegerField(verbose_name='個数', default=1)
 

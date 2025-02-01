@@ -18,8 +18,8 @@ class CartPageView(ListView):
         context = super().get_context_data(**kwargs)
         # カートオブジェクトを取得
         cart = Cart.get_or_create_cart(self.request)
-        # カートオブジェクトを元にカートない商品を取得
-        cart_products = CartProduct.objects.filter(cart=cart)
+        # カートオブジェクトを元にカート内の商品を取得
+        cart_products = cart.cart_products.all()
         # 何種類の商品が追加されたか
         total_type_products = total_cart_products(cart)
         # カート内の全商品の合計金額
