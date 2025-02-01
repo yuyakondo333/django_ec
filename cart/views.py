@@ -16,14 +16,8 @@ class CartPageView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # ECサイトにアクセスしているユーザーのセッションIDを取得
-        session_id = self.request.session.session_key
-        # なければ強制的にセッションIDを作成
-        if not session_id:
-            self.request.session.create()
-            session_id = self.request.session.session_key
-        # セッションIDを元にカートオブジェクトを取得
-        cart, created = Cart.objects.get_or_create(session_id=session_id)
+        # カートオブジェクトを取得
+        cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカートない商品を取得
         cart_products = CartProduct.objects.filter(cart=cart)
         # 何種類の商品が追加されたか
@@ -56,13 +50,8 @@ class AddToCartView(TemplateView):
 
         # バリデーション済みの値を取得
         num = form.cleaned_data["num"]
-        # セッションIDを取得（なければ作成）
-        session_id = request.session.session_key
-        if not session_id:
-            request.session.create()
-            session_id = request.session.session_key
-        # カートを作成または取得
-        cart, created = Cart.objects.get_or_create(session_id=session_id)
+        # カートIDを取得
+        cart = Cart.get_or_create_cart(self.request)
         # 商品を取得
         product = get_object_or_404(Product, id=product_id)
 

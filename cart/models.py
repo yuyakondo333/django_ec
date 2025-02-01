@@ -11,6 +11,16 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart: {self.id}, Sesson: {self.session_id}"
     
+    @classmethod
+    def get_or_create_cart(cls, request):
+        # セッションIDを取得（なければ作成）
+        session_id = request.session.session_key
+        if not session_id:
+            request.session.create()
+            session_id = request.session.session_key
+        # カートを作成または取得
+        cart, created = Cart.objects.get_or_create(session_id=session_id)
+        return cart
 
 class CartProduct(models.Model):
     cart = models.ForeignKey("cart.Cart", verbose_name=("カートID"), on_delete=models.CASCADE)
