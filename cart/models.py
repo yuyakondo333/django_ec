@@ -21,6 +21,27 @@ class Cart(models.Model):
         # カートを作成または取得
         cart, created = Cart.objects.get_or_create(session_id=session_id)
         return cart
+    
+    # カート内の合計金額
+    def total_amount(self):
+        return sum(cart_product.product.price * cart_product.quantity for cart_product in self.cart_products.all())
+    
+    # カート内の商品の合計個数
+    def total_products(self):
+        return sum(cart_product.quantity for cart_product in self.cart_products.all())
+    
+    # カートに商品を追加、個数を増やす（更新）
+    def add_product(self, product, quantity):
+        cart_product, created = CartProduct.objects.get_or_create(cart=self, product=product)
+        # 今回新しく作成されていない→→既にレコードがある場合
+        if not created:
+            cart_product.quantity += quantity
+        else:
+            # 今回 Add to cartでcart_productテーブルに新しいレコードを追加する場合
+            cart_product.quantity = quantity
+        cart_product.save()
+        return cart_product
+
 
 class CartProduct(models.Model):
     cart = models.ForeignKey("cart.Cart", verbose_name=("カートID"), on_delete=models.CASCADE, related_name="cart_products")

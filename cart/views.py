@@ -21,9 +21,9 @@ class CartPageView(ListView):
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.all()
         # 何種類の商品が追加されたか
-        total_type_products = total_cart_products(cart)
+        total_type_products = len(cart_products)
         # カート内の全商品の合計金額
-        total_cart_amount = sum(cart_product.product.price * cart_product.quantity for cart_product in cart_products)
+        total_cart_amount = cart.total_amount()
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"total_price": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -38,6 +38,7 @@ class CartPageView(ListView):
         context["total_cart_amount"] = total_cart_amount
         context["product_data"] = dict(product_data)
         return context
+
 
 
 class AddToCartView(TemplateView):
@@ -64,38 +65,15 @@ class AddToCartView(TemplateView):
         """
         num = request.POST.get("num", "1")
         num = int(num)
-        
         # カート内の商品を取得または作成
-        # createdは「今回新しく作成された」かどうか（boolean)
-        cart_product, created = CartProduct.objects.get_or_create(cart=cart, product=product)
-        
-        # 今回新しく作成されていない→→既にレコードがある場合
-        if not created:
-            cart_product.quantity += num
-        else:
-            # 今回 Add to cartでcart_productテーブルに新しいレコードを追加する場合
-            cart_product.quantity = num
-        cart_product.save()
-
-        # 合計個数
-        cart_total = total_cart_products(cart)
-
-        request.session["cart_total"] = cart_total
-
+        cart.add_product(product, num)
+        # カート内の合計個数をセッションに保存
+        request.session["cart_total"] = cart.total_products()
         # カート追加時のメッセージ
         messages.success(request, f'{product.name}をカートに追加しました')
-
+        # レスポンスで元いたページに戻る
         return redirect(request.META.get("HTTP_REFERER", reverse("products:index")))
-    
-def total_cart_products(cart):
-    # 同じカートIDのレコードを取得（filter使用）
-    cart_products = CartProduct.objects.filter(cart=cart)
 
-    # 取得したオブジェクトの合計を計算
-    total_quantiry = sum(cart_product.quantity for cart_product in cart_products)
-
-    # 合計個数をreturn
-    return total_quantiry
 
 class DeleteToCartView(DeleteView):
     template_name = 'cart/delete.html'
