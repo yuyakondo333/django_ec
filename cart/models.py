@@ -19,20 +19,20 @@ class Cart(models.Model):
             request.session.create()
             session_id = request.session.session_key
         # カートを作成または取得
-        cart, created = Cart.objects.get_or_create(session_id=session_id)
+        cart, _ = Cart.objects.get_or_create(session_id=session_id)
         return cart
     
     # カート内の合計金額
-    def total_amount(self):
-        return sum(cart_product.product.price * cart_product.quantity for cart_product in self.cart_products.all())
+    def total_price(self):
+        return sum(cart_product.sub_total_price() for cart_product in self.cart_products.all())
     
     # カート内の商品の合計個数
-    def total_products(self):
+    def total_quantity(self):
         return sum(cart_product.quantity for cart_product in self.cart_products.all())
     
     # カートに商品を追加、個数を増やす（更新）
     def add_product(self, product, quantity):
-        cart_product, created = CartProduct.objects.get_or_create(cart=self, product=product)
+        cart_product, created = self.cart_products.get_or_create(cart=self, product=product)
         # 今回新しく作成されていない→→既にレコードがある場合
         if not created:
             cart_product.quantity += quantity
@@ -50,3 +50,6 @@ class CartProduct(models.Model):
 
     class Meta:
         db_table = 'cart_product'
+
+    def sub_total_price(self):
+        return self.product.price * self.quantity

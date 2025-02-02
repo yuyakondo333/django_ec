@@ -20,10 +20,11 @@ class CartPageView(ListView):
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.all()
+        cart_products = cart.cart_products.select_related("product")
         # 何種類の商品が追加されたか
         total_type_products = len(cart_products)
         # カート内の全商品の合計金額
-        total_cart_amount = cart.total_amount()
+        total_cart_amount = cart.total_price()
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"total_price": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -38,7 +39,6 @@ class CartPageView(ListView):
         context["total_cart_amount"] = total_cart_amount
         context["product_data"] = dict(product_data)
         return context
-
 
 
 class AddToCartView(TemplateView):
@@ -68,7 +68,7 @@ class AddToCartView(TemplateView):
         # カート内の商品を取得または作成
         cart.add_product(product, num)
         # カート内の合計個数をセッションに保存
-        request.session["cart_total"] = cart.total_products()
+        request.session["cart_total"] = cart.total_quantity()
         # カート追加時のメッセージ
         messages.success(request, f'{product.name}をカートに追加しました')
         # レスポンスで元いたページに戻る
