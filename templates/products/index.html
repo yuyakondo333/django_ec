@@ -42,13 +42,17 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex">
-          <button class="btn btn-outline-dark" type="submit">
-            <i class="bi-cart-fill me-1"></i>
-            カート
-            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-          </button>
-        </form>
+        <a href="{% url "cart:cart_page" %}" class="btn btn-outline-dark">
+          <i class="bi-cart-fill me-1"></i>
+          カート
+          <span class="badge bg-dark text-white ms-1 rounded-pill">
+          {% if request.session.cart_total %}
+              {{ request.session.cart_total }}
+          {% else %}
+              0
+          {% endif %}
+          </span>
+        </a>
       </div>
     </div>
   </nav>
@@ -63,6 +67,16 @@
       </div>
     </div>
   </header>
+  <!-- Message-->
+  {% if messages %}
+  <div class="container mt-3">
+      {% for message in messages %}
+      <div class="messages alert alert-success" role="alert">
+          {{ message }}
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
   <!-- Section-->
   <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
@@ -89,7 +103,10 @@
             <div class="card-body p-4">
               <div class="text-center">
                 <!-- Product name-->
-                <h5 class="fw-bolder">{{ product.name }}</h5>
+                <a class="btn d-block" href="{% url "products:detail" product.id %}"
+                >
+                  <h5 class="fw-bolder">{{ product.name }}</h5>
+                </a>
                 <!-- Product price-->
                 &#0165; {{ product.price }}
               </div>
@@ -97,9 +114,13 @@
             <!-- Product actions-->
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
               <div class="text-center">
-                <a class="btn btn-outline-dark mt-auto" href="{% url "products:detail" product.id %}"
-                  >商品を見る</a
-                >
+                <form method="post" action="{% url "cart:add_to_cart" product.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="num" value="1">
+                  <button type="submit" class="btn btn-outline-dark mt-auto">
+                    Add to cart
+                  </button>
+                </form>
               </div>
             </div>
           </div>

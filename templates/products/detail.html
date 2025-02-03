@@ -43,16 +43,30 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex">
-          <button class="btn btn-outline-dark" type="submit">
-            <i class="bi-cart-fill me-1"></i>
-            カート
-            <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-          </button>
-        </form>
+        <a href="{% url "cart:cart_page" %}" class="btn btn-outline-dark">
+          <i class="bi-cart-fill me-1"></i>
+          カート
+          <span class="badge bg-dark text-white ms-1 rounded-pill">
+          {% if request.session.cart_total %}
+              {{ request.session.cart_total }}
+          {% else %}
+              0
+          {% endif %}
+          </span>
+        </a>
       </div>
     </div>
   </nav>
+  <!-- Message-->
+  {% if messages %}
+  <div class="container mt-3">
+      {% for message in messages %}
+      <div class="messages alert alert-success" role="alert">
+          {{ message }}
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
   <!-- Product section-->
   <section class="py-5">
     <div class="container px-4 px-lg-5 my-5">
@@ -79,17 +93,22 @@
           </div>
           <p class="lead">{{ product_detail.description }}</p>
           <div class="d-flex">
-            <input
-              class="form-control text-center me-3"
-              id="inputQuantity"
-              type="num"
-              value="1"
-              style="max-width: 3rem"
-            />
-            <button class="btn btn-outline-dark flex-shrink-0" type="button">
-              <i class="bi-cart-fill me-1"></i>
-              Add to cart
-            </button>
+            <form method="post" action="{% url "cart:add_to_cart" product_detail.id %}">
+              {% csrf_token %}
+              <input
+                class="form-control text-center me-3"
+                id="inputQuantity"
+                type="number"
+                name="num"
+                value="1"
+                min="1"
+                step="1"
+                style="max-width: 4rem"
+              />
+              <button type="submit" class="btn btn-outline-dark mt-auto d-inline-block">
+                Add to cart
+              </button>
+            </form>
           </div>
         </div>
       </div>
