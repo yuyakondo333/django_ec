@@ -23,6 +23,7 @@ class Cart(models.Model):
         return cart
     
     # カート内の合計金額
+    @property
     def total_price(self):
         return sum(cart_product.sub_total_price() for cart_product in self.cart_products.all())
     

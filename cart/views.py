@@ -24,19 +24,19 @@ class CartPageView(ListView):
         # 何種類の商品が追加されたか
         total_type_products = len(cart_products)
         # カート内の全商品の合計金額
-        total_cart_amount = cart.total_price()
+        total_cart_price = cart.total_price
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"total_price": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
         for cart_product in cart_products:
             product_name = cart_product.product.name
-            product_data[product_name]["total_price"] += cart_product.product.price * cart_product.quantity
+            product_data[product_name]["total_price"] += cart_product.sub_total_price
             product_data[product_name]["id"] = cart_product.id
             product_data[product_name]["price"] = cart_product.product.price
             product_data[product_name]["quantity"] += cart_product.quantity
 
         context["total_type_products"] = total_type_products
-        context["total_cart_amount"] = total_cart_amount
+        context["total_cart_price"] = total_cart_price
         context["product_data"] = dict(product_data)
         return context
 
