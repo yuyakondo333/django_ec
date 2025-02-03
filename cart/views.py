@@ -30,7 +30,7 @@ class CartPageView(ListView):
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
         for cart_product in cart_products:
             product_name = cart_product.product.name
-            product_data[product_name]["total_price"] += cart_product.sub_total_price
+            product_data[product_name]["total_price"] += cart_product.sub_total_price()
             product_data[product_name]["id"] = cart_product.id
             product_data[product_name]["price"] = cart_product.product.price
             product_data[product_name]["quantity"] += cart_product.quantity
