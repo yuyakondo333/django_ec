@@ -19,7 +19,6 @@ class CartPageView(ListView):
         # カートオブジェクトを取得
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
-        cart_products = cart.cart_products.all()
         cart_products = cart.cart_products.select_related("product")
         # 何種類の商品が追加されたか
         total_type_products = len(cart_products)
@@ -57,18 +56,13 @@ class AddToCartView(TemplateView):
         product = get_object_or_404(Product, id=product_id)
 
         """
-        詳細画面から個数指定された際に
-        request.POST.get()でname="num"となっているinputタグから取得
-        index,reletedはtype="hidden" name="num" value="1" に設定して
-        「Add to cart」をクリックした際は value の1を使用
+        詳細画面から個数指定された際にrequest.POST.get()でname="num"となっているinputタグから取得
+        index,reletedはtype="hidden" name="num" value="1" に設定して「Add to cart」をクリックした際は value の1を使用
         フォームのデータ型は文字列。整数を扱いたいからint型に変換
         """
-        num = request.POST.get("num", "1")
-        num = int(num)
+        num = int(request.POST.get("num", "1"))
         # カート内の商品を取得または作成
         cart.add_product(product, num)
-        # カート内の合計個数をセッションに保存
-        request.session["cart_total"] = cart.total_quantity()
         # カート追加時のメッセージ
         messages.success(request, f'{product.name}をカートに追加しました')
         # レスポンスで元いたページに戻る

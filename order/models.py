@@ -7,11 +7,11 @@ class BillingAddress(models.Model):
     first_name = models.CharField("名")
     username = models.CharField("ユーザー名", unique=True)
     email = models.EmailField("メールアドレス", blank=True, null=True)
-    countory = models.CharField("国")
+    country = models.CharField("国")
     state_prefecture = models.CharField("州/県")
     zip = models.CharField("郵便番号", max_length=9)
     address1 = models.CharField("住所1", max_length=255)
-    address2 = models.CharField("住所2", max_length=255)
+    address2 = models.CharField("住所2", max_length=255, blank=True, null=True)
     same_address = models.BooleanField("請求先と配送先が同じ", default=False)
     next_save = models.BooleanField("配送先住所を保存", default=False)
 
@@ -28,9 +28,20 @@ class Payment(models.Model):
     class Meta:
         db_table = 'payment'
 
+    # ハッシュ化
+    @staticmethod
+    def hashed_card_number(card):
+        import hashlib
+        return hashlib.sha256(card.encode()).hexdigest()
+
+    # 下四桁を切り出す
+    @staticmethod
+    def card_number_slice(card):
+        return card[-4:]
+
 
 class Order(models.Model):
-    cart = models.ForeignKey("cart.Cart", verbose_name="カートID", on_delete=models.CASCADE)
+    cart = models.ForeignKey("cart.Cart", verbose_name="カートID", on_delete=models.CASCADE, related_name="purchased_cart")
     billing_address = models.ForeignKey("BillingAddress", verbose_name="配送先ID", on_delete=models.CASCADE)
     payment = models.ForeignKey("Payment", verbose_name="支払いID", on_delete=models.CASCADE)
 

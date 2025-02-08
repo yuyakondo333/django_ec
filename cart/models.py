@@ -1,9 +1,11 @@
 from django.db import models
 from products.models import Product
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 class Cart(models.Model):
-    session_id = models.CharField(max_length=32, unique=True)
+    session_id = models.CharField(max_length=32, unique=True, default="temp_session_id")
+    is_purchased = models.BooleanField("購入済み", default=False)
 
     class Meta:
         db_table = 'cart'
@@ -11,15 +13,26 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart: {self.id}, Sesson: {self.session_id}"
     
+    def check_if_purchased(self, *args, **kwargs):
+        if self.is_purchased:
+            raise ValidationError("このカートは購入済みのため編集できません")
+        super().save(*args, **kwargs)
+    
     @classmethod
     def get_or_create_cart(cls, request):
         # セッションIDを取得（なければ作成）
-        session_id = request.session.session_key
-        if not session_id:
+        if not request.session.session_key:
             request.session.create()
-            session_id = request.session.session_key
-        # カートを作成または取得
+        session_id = request.session.session_key
+
         cart, _ = Cart.objects.get_or_create(session_id=session_id)
+
+        # 購入済みフラグがTrueなら、新しいカートを作成
+        if cart.is_purchased:
+            request.session.create()    # 新しいセッションを作成
+            session_id = request.session.session_key
+            cart = Cart.objects.create(session_id=session_id)
+            
         return cart
     
     # カート内の合計金額

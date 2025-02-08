@@ -54,7 +54,7 @@
         <div class="col-md-7 col-lg-8">
             <h4 class="mb-3">Billing address</h4>
             <form method="post" 
-                    action=""
+                    action="{% url 'order:order' %}"
                     class="needs-validation"
                     novalidate
             >
@@ -96,7 +96,7 @@
 
                     <div class="col-md-6">
                         <label for="country" class="form-label">国</label>
-                        <select class="form-select" id="country" required>
+                        <select class="form-select" id="country" name="country" required>
                             <option value="">Choose...</option>
                             <option>United States</option>
                         </select>
@@ -106,8 +106,8 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="state" class="form-label">州/県</label>
-                        <select class="form-select" id="state" required>
+                        <label for="state_prefecture" class="form-label">州/県</label>
+                        <select class="form-select" id="state_prefecture" name="state_prefecture" required>
                             <option value="">Choose...</option>
                             <option>California</option>
                         </select>
@@ -116,10 +116,10 @@
                         </div>
                     </div>
 
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <div class="d-flex align-items-end">
                             <div class="me-2">
-                                <label for="zip" class="form-label">郵便番号</label>
+                                <label for="zip" class="form-label">郵便番号 <span>（「-」ありで記述）</span></label>
                                 <input type="text" name="zip" class="form-control" id="zip" placeholder="000-5555" required>
                                 <div class="invalid-feedback">
                                     Zip code required.
@@ -149,12 +149,12 @@
                 <hr class="my-4">
 
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="same-address">
+                    <input type="checkbox" class="form-check-input" id="same-address" name="same_address">
                     <label class="form-check-label" for="same-address">Shipping address is the same as my billing address</label>
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="save-info">
+                    <input type="checkbox" class="form-check-input" id="save-info" name="next_save">
                     <label class="form-check-label" for="save-info">Save this information for next time</label>
                 </div>
 
@@ -168,7 +168,7 @@
                 <div class="row gy-3">
                     <div class="col-md-6">
                         <label for="cc-name" class="form-label">カード名義</label>
-                        <input type="text" name="card_name" class="form-control" id="cc-name" placeholder="TARO YAMADA" required>
+                        <input type="text" name="card_holder" class="form-control" id="cc-name" placeholder="TARO YAMADA" required>
                         <div class="invalid-feedback">
                             Name on card is required
                         </div>
@@ -185,9 +185,7 @@
                     <div class="col-md-4">
                         <label for="cc-expiration" class="form-label">有効期限 (MM/YY)</label>
                         <div class="d-flex">
-                            <input type="text" name="expiry_month" class="form-control me-2 text-center" id="cc-expiration-month" placeholder="MM" maxlength="2" required>
-                            <span class="align-self-center">/</span>
-                            <input type="text" name="expiry_year" class="form-control ms-2 text-center" id="cc-expiration-year" placeholder="YY" maxlength="2" required>
+                            <input type="text" name="expiration_date" class="form-control me-2" id="cc-expiration-month" placeholder="MM/YY" maxlength="5" required>
                         </div>
                         <div class="invalid-feedback">
                             Expiration date required
