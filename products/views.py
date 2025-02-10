@@ -14,7 +14,7 @@ class ProductIndexView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cart = Cart.get_or_create_cart(self.request)
-        context["cart_total"] = cart.total_quantity()
+        context["cart_total"] = cart.total_quantity
         return context
 
     def get_queryset(self):
@@ -32,5 +32,5 @@ class ProductDetailView(generic.DetailView):
         context['related_list'] = related_products
 
         cart = Cart.get_or_create_cart(self.request)
-        context["cart_total"] = Cart.total_quantity()
+        context["cart_total"] = cart.total_quantity
         return context

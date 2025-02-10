@@ -41,6 +41,7 @@ class Cart(models.Model):
         return sum(cart_product.sub_total_price() for cart_product in self.cart_products.all())
     
     # カート内の商品の合計個数
+    @property
     def total_quantity(self):
         return sum(cart_product.quantity for cart_product in self.cart_products.all())
     

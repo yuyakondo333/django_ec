@@ -9,7 +9,7 @@ class BillingAddress(models.Model):
     email = models.EmailField("メールアドレス", blank=True, null=True)
     country = models.CharField("国")
     state_prefecture = models.CharField("州/県")
-    zip = models.CharField("郵便番号", max_length=9)
+    zip = models.CharField("郵便番号", max_length=7)
     address1 = models.CharField("住所1", max_length=255)
     address2 = models.CharField("住所2", max_length=255, blank=True, null=True)
     same_address = models.BooleanField("請求先と配送先が同じ", default=False)
@@ -22,8 +22,8 @@ class BillingAddress(models.Model):
 class Payment(models.Model):
     card_holder = models.CharField("カード名義")
     card_number_hash = models.CharField("カード番号（暗号化）", max_length=255)
-    card_last4 = models.CharField("カード下4桁", max_length=4)
-    expiration_date = models.CharField("有効期限", max_length=7)
+    card_last4 = models.CharField("カード下4桁", max_length=19)
+    expiration_date = models.CharField("有効期限", max_length=5)
 
     class Meta:
         db_table = 'payment'
