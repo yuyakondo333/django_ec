@@ -40,10 +40,6 @@ class OrderView(View):
                 "total_cart_price": cart.total_price,
                 "total_type_products": len(product_data),
             })
-        print("billing_address_form.is_valid():", billing_address_form.is_valid())
-        print("payment_form.is_valid():", payment_form.is_valid())
-
-
         
         # カート内の商品がない場合エラーを返してリダイレクト
         if not cart_products:
