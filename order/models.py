@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import datetime
+from django.core.validators import MinValueValidator
 
 # Create your models here.
 
@@ -9,7 +11,7 @@ class BillingAddress(models.Model):
     email = models.EmailField("メールアドレス", blank=True, null=True)
     country = models.CharField("国")
     state_prefecture = models.CharField("州/県")
-    zip = models.CharField("郵便番号", max_length=7)
+    zip = models.CharField("郵便番号", max_length=8)
     address1 = models.CharField("住所1", max_length=255)
     address2 = models.CharField("住所2", max_length=255, blank=True, null=True)
     same_address = models.BooleanField("請求先と配送先が同じ", default=False)
@@ -41,9 +43,25 @@ class Payment(models.Model):
 
 
 class Order(models.Model):
-    cart = models.ForeignKey("cart.Cart", verbose_name="カートID", on_delete=models.CASCADE, related_name="purchased_cart")
     billing_address = models.ForeignKey("BillingAddress", verbose_name="配送先ID", on_delete=models.CASCADE)
     payment = models.ForeignKey("Payment", verbose_name="支払いID", on_delete=models.CASCADE)
+    created_at = models.DateTimeField("購入日時", auto_now_add=True)
 
     class Meta:
         db_table = 'order'
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey("Order", verbose_name="注文ID", on_delete=models.CASCADE, related_name="order")
+    name = models.CharField("商品名", max_length=20)
+    price = models.PositiveIntegerField("商品価格", validators=[MinValueValidator(1)])
+    quantity = models.PositiveIntegerField("個数", validators=[MinValueValidator(1)])
+    subtotal = models.PositiveIntegerField("小計", validators=[MinValueValidator(1)])
+
+    class Meta:
+        db_table = 'order_item'
+
+    # 小計を計算
+    def save(self, *args, **kwargs):
+        self.subtotal = self.price * self.quantity
+        super().save(*args, **kwargs)

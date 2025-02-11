@@ -23,7 +23,7 @@
                     <h6 class="my-0">{{ product_name }}</h6>
                     <small class="text-body-secondary">{{ data.price }}&#0215;{{ data.quantity }}</small>
                     </div>
-                    <span class="text-body-secondary">&#0165;{{ data.total_price }}</span>
+                    <span class="text-body-secondary">&#0165;{{ data.subtotal }}</span>
                 </li>
                 <div class="mb-3">
                     <a href="{% url 'cart:delete' data.id %}" class="btn btn-danger d-block">商品を削除する</a>
@@ -70,7 +70,13 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label for="username" class="form-label">ユーザー名 <span class="text-danger">※購入明細を確認する際に使用</span></label>
-                        {{ form.username.errors }}
+                        {% if billing_address_form.username.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in billing_address_form.username.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <div class="input-group has-validation">
                             <span class="input-group-text">@</span>
                             <input type="text"
@@ -80,52 +86,61 @@
                                     placeholder="ユーザー名"
                                     required
                             >
-                            {% if form.name.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.name.errors|join:", " }}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
+
+                    <!-- 姓名のエラーメッセージ -->
+                    {% if billing_address_form.last_name.errors or billing_address_form.first_name.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in billing_address_form.last_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="alert alert-danger">
+                            {% for error in billing_address_form.first_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
                     <!-- 姓 -->
                     <div class="col-sm-6">
                         <label for="lastName" class="form-label">姓</label>
                         <input type="text" name="last_name" class="form-control" id="lastName" placeholder="山田" value="{{ billing_address_form.last_name.value|default:'' }}" required>
-                        {% if form.last_name.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.last_name.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                     </div>
                     
                     <!-- 名 -->
                     <div class="col-sm-6">
                         <label for="firstName" class="form-label">名</label>
                         <input type="text" name="first_name" class="form-control" id="firstName" placeholder="太郎" value="{{ billing_address_form.first_name.value|default:'' }}" required>
-                        {% if form.first_name.errors %}
-                        <div class="invalid-feedback">
-                            {% for error in form.first_name.errors %}
-                            <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                     
                     <!-- メールアドレス -->
                     <div class="col-12">
                         <label for="email" class="form-label">メールアドレス <span class="text-body-secondary">(任意)</span></label>
+                        {% if billing_address_form.email.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in billing_address_form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <input type="email" name="email" class="form-control" id="email" placeholder="you@example.com" value="{{ billing_address_form.email.value|default:'' }}">
-                        {% if form.email.errors %}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                            <p>{{ error }}</p>
+                    </div>
+                    
+                    <!-- 国,州/県のエラーメッセージ -->
+                    {% if billing_address_form.country.errors or billing_address_form.state_prefecture.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in billing_address_form.country.errors %}
+                                <p>{{ error }}</p>
                             {% endfor %}
                         </div>
-                        {% endif %}
-                    </div>
+                        <div class="alert alert-danger">
+                            {% for error in billing_address_form.state_prefecture.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     
                     <!-- 国 -->
                     <div class="col-md-6">
@@ -155,16 +170,18 @@
                     <div class="col-md-6">
                         <div class="d-flex align-items-end">
                             <div class="me-2">
-                                <label for="zip" class="form-label">郵便番号 <span>（「-」なしで記述）</span></label>
-                                <input type="text" name="zip" class="form-control" id="zip" placeholder="000-5555" value="{{ billing_address_form.zip.value|default:'' }}" required>
+                                <label for="zip" class="form-label">郵便番号 <span>（ハイフンなし）</span></label>
+                                {% if billing_address_form.zip.errors %}
+                                    <div class="alert alert-danger">
+                                        {% for error in billing_address_form.zip.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <input type="text" name="zip" class="form-control" id="zip" placeholder="0001111" value="{{ billing_address_form.zip.value|default:'' }}" required>
                                 <div class="invalid-feedback">
                                     Zip code required.
                                 </div>
-                            </div>
-                            <div>
-                                <form action="">
-                                    <button type="submit" class="btn btn-secondary">住所検索</button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -172,16 +189,27 @@
                     <!-- 住所1 -->
                     <div class="col-12 mb-2">
                         <label for="address" class="form-label">住所</label>
+                        {% if billing_address_form.address1.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in billing_address_form.address1.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <input type="text" name="address1" class="form-control" id="address" placeholder="1234 Main St" value="{{ billing_address_form.address1.value|default:'' }}" required>
-                        <div class="invalid-feedback">
-                            Please enter your shipping address.
-                        </div>
                     </div>
                     
                     <!-- 住所2 -->
                     <div class="col-12">
                         <label for="address2" name="address2" class="form-label">アパート、マンション、部屋番号<span class="text-body-secondary">(任意)</span></label>
-                    <input type="text" class="form-control" id="address2" placeholder="Apartment or suite" value="{{ billing_address_form.address2.value|default:'' }}">
+                        {% if billing_address_form.address2.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in billing_address_form.address2.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <input type="text" class="form-control" id="address2" placeholder="Apartment or suite" value="{{ billing_address_form.address2.value|default:'' }}">
                     </div>
 
                 <hr class="my-4">
@@ -203,38 +231,51 @@
                     <small>※クレジットカードのみお支払い可能です</small>
                 </div>
 
+                <!-- カード名義,番号エラーメッセージ -->
+                {% if payment_form.card_holder.errors or payment_form.card_number.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in payment_form.card_holder.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="alert alert-danger">
+                        {% for error in payment_form.card_number.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <div class="row gy-3">
+                    <!-- カード名義 -->
                     <div class="col-md-6">
                         <label for="cc-name" class="form-label">カード名義</label>
                         <input type="text" name="card_holder" class="form-control" id="cc-name" placeholder="TARO YAMADA" value="{{ payment_form.card_holder.value|default:'' }}" required>
-                        <div class="invalid-feedback">
-                            Name on card is required
-                        </div>
                     </div>
-
+                    
+                    <!-- カード番号 -->
                     <div class="col-md-6">
                         <label for="cc-number" class="form-label">カード番号</label>
                         <input type="text" name="card_number" class="form-control" id="cc-number" value="{{ payment_form.card_number.value|default:'' }}" placeholder="1111-2222-3333-4444" required>
-                        <div class="invalid-feedback">
-                            Credit card number is required
-                        </div>
                     </div>
+                    
+                    {% if payment_form.expiration_date.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in payment_form.expiration_date.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
+                    <!-- 有効期限 -->
                     <div class="col-md-4">
                         <label for="cc-expiration" class="form-label">有効期限 (MM/YY)</label>
-                        <div class="d-flex">
-                            <input type="text" name="expiration_date" class="form-control me-2" id="cc-expiration-month" placeholder="MM/YY" value="{{ payment_form.expiration_date.value|default:'' }}" maxlength="5" required>
-                        </div>
-                        <div class="invalid-feedback">
-                            Expiration date required
-                        </div>
+                        <input type="text" name="expiration_date" class="form-control me-2" id="cc-expiration-month" placeholder="MM/YY" value="{{ payment_form.expiration_date.value|default:'' }}" maxlength="5" required>
                     </div>
+
+                    <!-- CVV -->
                     <div class="col-md-3">
                         <label for="cc-cvv" class="form-label">CVV</label>
                         <input type="text" name="cvv" class="form-control" id="cc-cvv" placeholder="" required>
-                        <div class="invalid-feedback">
-                            Security code required
-                        </div>
                     </div>
                 </div>
 

@@ -31,11 +31,9 @@ class BillingAddressForm(forms.ModelForm):
     
     def clean_username(self):
         username = self.cleaned_data.get("username", "")
-        print(username)
         match_word = r'[0-9a-zA-Zぁ-んァ-ン\u4E00-\u9FFF\u3005-\u3007]+'
         re_name = re.compile(match_word)
         if username and not re_name.fullmatch(username):
-            print("ユーザー名ダメー")
             raise ValidationError("ユーザー名は数字、アルファベット、ひらがな、カタカナ、漢字で入力してください")
         return username
 
@@ -50,14 +48,16 @@ class BillingAddressForm(forms.ModelForm):
         
         # 「.com」,「.jp」で終わるメールアドレス以外はエラーを返す
         if not email.endswith((".com", ".jp")):
-            raise forms.ValidationError('メールアドレスは.com, .jpで終わる必要があります')
+            raise forms.ValidationError('メールアドレスは「.com」「.jp」で終わるメールアドレスにしてください')
         return email
 
     # 郵便番号のチェック
     def clean_zip(self, *args, **kwargs):
         zip_code = self.cleaned_data.get("zip", "")
-        if zip_code and not re.match(r'^\d{3}-?\d{4}$', zip_code):
-            raise forms.ValidationError("郵便番号は「NNN-NNNN」または「NNNNNNN」の形式で入力してください。")
+        match_word = r'^[0-9]{7}$'
+        re_zip = re.compile(match_word)
+        if zip_code and not re_zip.fullmatch(zip_code):
+            raise forms.ValidationError("郵便番号は7桁の数字で入力してください")
         return zip_code
 
 
@@ -84,6 +84,8 @@ class PaymentForm(forms.ModelForm):
     def clean_card_number(self, *args, **kwargs):
         # 入力した番号に「-」が含まれている場合は "" にreplace
         card_number = self.cleaned_data.get("card_number").replace("/", "")
+        if not card_number:
+            raise ValidationError("カード番号を入力してください")
         # 入力内容が数字だけか isdigit() でチェック→数字以外が入っていたらエラー
         if not card_number.isdigit():
             raise ValidationError("カード番号は数字を入力してください")
@@ -130,7 +132,7 @@ class PaymentForm(forms.ModelForm):
             doubled_digits = digits_of(doubled)
             sum_doubled = sum(doubled_digits)
             checksum += sum_doubled
-            return checksum % 10 == 0
+        return checksum % 10 == 0
 
     # 有効期限のチェック
     def clean_expiration_date(self, *args, **kwargs):
