@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'custom_admin.apps.CustomAdminConfig',
     'products.apps.ProductsConfig',
     'cart.apps.CartConfig',
+    'order.apps.OrderConfig',
     'cloudinary',
     'cloudinary_storage',
 ]
