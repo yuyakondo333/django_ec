@@ -13,6 +13,7 @@ class AdminLogin(LoginView):
     # テンプレートを選択
     template_name = 'admin/auth/login.html'
     form_class = LoginForm
+    success_url = reverse_lazy('custom_admin:product_index')
 
 
 class AdminLogout(LogoutView):
