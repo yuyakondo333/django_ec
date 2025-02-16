@@ -43,7 +43,7 @@ class Payment(models.Model):
 
 
 class Order(models.Model):
-    billing_address = models.ForeignKey("BillingAddress", verbose_name="配送先ID", on_delete=models.CASCADE)
+    billing_address = models.ForeignKey("BillingAddress", verbose_name="配送先ID", on_delete=models.CASCADE, related_name="billing_address")
     payment = models.ForeignKey("Payment", verbose_name="支払いID", on_delete=models.CASCADE)
     created_at = models.DateTimeField("購入日時", auto_now_add=True)
 

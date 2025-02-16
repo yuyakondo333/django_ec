@@ -15,4 +15,9 @@ urlpatterns = [
     path('products/<int:pk>/',login_required(views.AdminProductDetailView.as_view()),name='product_detail'),
     path('products/<int:pk>/update',login_required(views.AdminProductUpdateView.as_view()),name='product_update'),
     path('products/<int:pk>/delete',login_required(views.AdminProductDeleteView.as_view()),name='product_delete'),
+
+    # 管理画面の注文情報に関するURL
+    path('order/', login_required(views.AdminOrderIndexView.as_view()), name='order_index'),
+    path('order/<int:pk>/', login_required(views.AdminOrderDetailView.as_view()), name='order_detail'),
+
 ]

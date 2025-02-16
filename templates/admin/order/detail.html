@@ -1,0 +1,53 @@
+{% extends "../admin_base.html" %}
+{% block title %}購入明細{% endblock %}
+{% block content %}
+{% load static %}
+
+<body class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>購入商品詳細</h1>
+        <div class="d-flex gap-2">
+            <!-- 購入一覧画面へ戻る -->
+            <a href="{% url 'custom_admin:order_index' %}" class="btn btn-secondary btn-md">
+                一覧画面へ戻る
+            </a>
+            <!-- ログアウトボタン -->
+            <form method="post" action="{% url 'custom_admin:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">ログアウト</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注文情報一覧テーブル -->
+    <p class="text-start">注文ID: {{ order_id }} </p>
+    <p class="text-start">ユーザー名: {{ username }}</p>
+    <p class="text-start">合計金額(¥): {{ total_subtotal }}</p>
+
+    <table class="table table-striped table-bordered" border="1">
+        <thead class="table-dark">
+            <tr>
+                <th>商品名</th>
+                <th>価格</th>
+                <th>個数</th>
+                <th>小計</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_item in order_items %}
+                <tr>
+                    <td>{{ order_item.name }}</td>
+                    <td>{{ order_item.price }}</td>
+                    <td>{{ order_item.quantity }}</td>
+                    <td>{{ order_item.subtotal }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">注文履歴がありません。</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+{% endblock %}
