@@ -30,7 +30,7 @@ class AdminProductIndexView(ListView):
     context_object_name = "product_list"
 
     def get_queryset(self):
-        return Product.objects.all()
+        return Product.objects.all().order_by('-id')
 
 
 class AdminProductCreateView(CreateView):
@@ -69,7 +69,7 @@ class AdminOrderIndexView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # 注文情報を取得(関連情報も取得するためのselect_relatedを使用)
-        orders = Order.objects.select_related('billing_address').all()
+        orders = Order.objects.select_related('billing_address').all().order_by('-id')
 
         # コンテキストに渡すためのデータを格納するリストを定義
         order_summary = []
@@ -104,7 +104,7 @@ class AdminOrderDetailView(ListView):
     def get_queryset(self):
         order_id = self.kwargs.get('pk')    # URLから注文IDを取得
         # order_idに紐づく購入商品を取得し、関連する請求先住所も取得
-        return OrderItem.objects.select_related('order__billing_address').filter(order_id=order_id)
+        return OrderItem.objects.select_related('order__billing_address').filter(order_id=order_id).order_by('-id')
     
     # コンテキストデータを設定するメソッドを定義
     def get_context_data(self, **kwargs):
