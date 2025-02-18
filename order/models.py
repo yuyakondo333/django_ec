@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.core.validators import MinValueValidator
+from django.core.mail import send_mail
 
 # Create your models here.
 
