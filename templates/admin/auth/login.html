@@ -10,7 +10,7 @@
         <div class="card border-0 shadow rounded-3 my-5">
           <div class="card-body p-4 p-sm-5">
             <h5 class="card-title text-center mb-5 fw-light fs-5">管理画面にログイン</h5>
-            <form action="" method="POST" class="mt-4">
+            <form action="{% url 'custom_admin:login' %}" method="POST" class="mt-4">
               {% csrf_token %}
               <!-- 全体のエラーメッセージを表示 -->
               {% if form.non_field_errors %}

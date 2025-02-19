@@ -4,6 +4,7 @@ charset-normalizer==3.4.1
 cloudinary==1.42.1
 dj-database-url==2.3.0
 Django==4.2.5
+django-anymail==12.0
 django-cloudinary-storage==0.3.0
 django-environ==0.11.2
 django-heroku==0.3.1
@@ -13,9 +14,13 @@ packaging==24.2
 pillow==11.1.0
 psycopg==3.1.12
 psycopg2==2.9.10
+python-http-client==3.3.7
 requests==2.32.3
+sendgrid==6.11.0
+sendmail==2.0
 six==1.17.0
 sqlparse==0.5.3
+starkbank-ecdsa==2.2.0
 typing_extensions==4.12.2
 urllib3==2.3.0
 whitenoise==6.8.2
