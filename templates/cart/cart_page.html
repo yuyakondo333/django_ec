@@ -219,6 +219,9 @@
                                         name="zip"
                                         class="form-control"
                                         id="zip"
+                                        inputmode="numeric"
+                                        pattern="\d{7}"
+                                        maxlength="7"
                                         placeholder="0001111"
                                         value="{{ billing_address_form.zip.value|default:'' }}"
                                         required
@@ -335,8 +338,11 @@
                                 name="card_number"
                                 class="form-control"
                                 id="cc-number"
+                                inputmode="numeric"
+                                pattern="\d{13,19}"
+                                maxlength="19"
                                 value="{{ payment_form.card_number.value|default:'' }}"
-                                placeholder="1111-2222-3333-4444"
+                                placeholder="1111 2222 3333 4444"
                                 required
                         >
                         <div class="invalid-feedback">
@@ -376,7 +382,10 @@
                                 name="cvv"
                                 class="form-control"
                                 id="cc-cvv"
-                                placeholder=""
+                                placeholder="000"
+                                pattern="\d{3,4}"
+                                maxlength="4"
+                                inputmode="numeric"
                                 required
                         >
                         <div class="invalid-feedback">
