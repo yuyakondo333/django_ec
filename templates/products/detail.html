@@ -61,7 +61,7 @@
   {% if messages %}
   <div class="container mt-3">
       {% for message in messages %}
-      <div class="messages alert alert-success" role="alert">
+      <div class="messages alert alert-danger" role="alert">
           {{ message }}
       </div>
       {% endfor %}
@@ -104,6 +104,7 @@
                 min="1"
                 step="1"
                 style="max-width: 4rem"
+                required
               />
               <button type="submit" class="btn btn-outline-dark mt-auto d-inline-block">
                 Add to cart

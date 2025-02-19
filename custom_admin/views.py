@@ -119,5 +119,4 @@ class AdminOrderDetailView(ListView):
         context['total_subtotal'] = sum(order_item.subtotal for order_item in order_items)
         # context['total_subtotal'] = sum(item.subtotal for item in order_items)
 
-        print("コンテキスト:", context)     # デバック用にコンテキストを出力
         return context

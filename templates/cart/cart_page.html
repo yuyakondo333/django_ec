@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}商品詳細{% endblock %}
+{% block title %}カートページ{% endblock %}
 {% block content %}
 {% load static %}
 
@@ -20,14 +20,19 @@
                 {% for product_name, data in product_data.items %}
                 <li class="list-group-item d-flex justify-content-between lh-sm">
                     <div>
-                    <h6 class="my-0">{{ product_name }}</h6>
-                    <small class="text-body-secondary">{{ data.price }}&#0215;{{ data.quantity }}</small>
+                        <h6 class="my-0">{{ product_name }}</h6>
+                        <small class="text-body-secondary">{{ data.price }}&#0215;{{ data.quantity }}</small>
                     </div>
-                    <span class="text-body-secondary">&#0165;{{ data.subtotal }}</span>
+                    <div class="d-flex align-items-center">
+                        <span class="text-body-secondary px-2">&#0165;{{ data.subtotal }}</span>
+                        <a href="{% url 'cart:delete' data.id %}" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" />
+                            </svg>
+                        </a>
+                    </div>
                 </li>
-                <div class="mb-3">
-                    <a href="{% url 'cart:delete' data.id %}" class="btn btn-danger d-block">商品を削除する</a>
-                </div>
                 {% endfor %}
                 <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
                     <div class="text-success">
@@ -42,12 +47,13 @@
                 </li>
             </ul>
 
-            <form class="card p-2">
+            <!-- プロモーションコード -->
+            <a href="" class="text-decoration-none card p-2">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Promo code">
                     <button type="submit" class="btn btn-secondary">Redeem</button>
                 </div>
-            </form>
+            </a>
         </div>
 
         <div class="col-md-7 col-lg-8">
@@ -59,17 +65,13 @@
                 {% endfor %}
             {% endif %}
             <h4 class="mb-3">Billing address</h4>
-            <form method="post" 
-                    action="{% url 'order:order' %}"
-                    class="needs-validation"
-                    novalidate
-            >
+            <form id="order_info" method="post" action="{% url 'order:order' %}">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <!-- ユーザー名 -->
                 <div class="row g-3">
                     <div class="col-12">
-                        <label for="username" class="form-label">ユーザー名 <span class="text-danger">※購入明細を確認する際に使用</span></label>
+                        <label for="username" class="form-label">ユーザー名</label>
                         {% if billing_address_form.username.errors %}
                             <div class="alert alert-danger">
                                 {% for error in billing_address_form.username.errors %}
@@ -86,6 +88,9 @@
                                     placeholder="ユーザー名"
                                     required
                             >
+                            <div class="invalid-feedback">
+                                ユーザー名は必須です。
+                            </div>
                         </div>
                     </div>
 
@@ -106,13 +111,33 @@
                     <!-- 姓 -->
                     <div class="col-sm-6">
                         <label for="lastName" class="form-label">姓</label>
-                        <input type="text" name="last_name" class="form-control" id="lastName" placeholder="山田" value="{{ billing_address_form.last_name.value|default:'' }}" required>
+                        <input type="text"
+                                name="last_name"
+                                class="form-control"
+                                id="lastName"
+                                placeholder="山田"
+                                value="{{ billing_address_form.last_name.value|default:'' }}"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            姓は必須です。
+                        </div>
                     </div>
                     
                     <!-- 名 -->
                     <div class="col-sm-6">
                         <label for="firstName" class="form-label">名</label>
-                        <input type="text" name="first_name" class="form-control" id="firstName" placeholder="太郎" value="{{ billing_address_form.first_name.value|default:'' }}" required>
+                        <input type="text"
+                                name="first_name"
+                                class="form-control"
+                                id="firstName"
+                                placeholder="太郎"
+                                value="{{ billing_address_form.first_name.value|default:'' }}"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            名は必須です。
+                        </div>
                     </div>
                     
                     <!-- メールアドレス -->
@@ -125,7 +150,13 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        <input type="email" name="email" class="form-control" id="email" placeholder="you@example.com" value="{{ billing_address_form.email.value|default:'' }}">
+                        <input type="email"
+                                name="email"
+                                class="form-control"
+                                id="email"
+                                placeholder="you@example.com"
+                                value="{{ billing_address_form.email.value|default:'' }}"
+                        >
                     </div>
                     
                     <!-- 国,州/県のエラーメッセージ -->
@@ -145,24 +176,30 @@
                     <!-- 国 -->
                     <div class="col-md-6">
                         <label for="country" class="form-label">国</label>
-                        <select class="form-select" id="country" name="country"
-                                data-selected="{{ billing_address_form.country.value|default:'' }}" required>
+                        <select class="form-select"
+                                id="country"
+                                name="country"
+                                data-selected="{{ billing_address_form.country.value|default:'' }}"
+                                required>
                             <option value="">Choose...</option>
                         </select>
                         <div class="invalid-feedback">
-                            Please select a valid country.
+                            国の選択は必須です。
                         </div>
                     </div>
                     
                     <!-- 州/県 -->
                     <div class="col-md-6">
                         <label for="state_prefecture" class="form-label">州/県</label>
-                        <select class="form-select" id="state_prefecture" name="state_prefecture"
-                                data-selected="{{ billing_address_form.state_prefecture.value|default:'' }}" required>
+                        <select class="form-select"
+                                id="state_prefecture"
+                                name="state_prefecture"
+                                data-selected="{{ billing_address_form.state_prefecture.value|default:'' }}"
+                                required>
                             <option value="">Choose a country first...</option>
                         </select>
                         <div class="invalid-feedback">
-                            Please provide a valid state.
+                            州/県の選択は必須です。
                         </div>
                     </div>
                     
@@ -178,9 +215,16 @@
                                         {% endfor %}
                                     </div>
                                 {% endif %}
-                                <input type="text" name="zip" class="form-control" id="zip" placeholder="0001111" value="{{ billing_address_form.zip.value|default:'' }}" required>
+                                <input type="text"
+                                        name="zip"
+                                        class="form-control"
+                                        id="zip"
+                                        placeholder="0001111"
+                                        value="{{ billing_address_form.zip.value|default:'' }}"
+                                        required
+                                >
                                 <div class="invalid-feedback">
-                                    Zip code required.
+                                    郵便番号は必須です
                                 </div>
                             </div>
                         </div>
@@ -196,7 +240,17 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        <input type="text" name="address1" class="form-control" id="address" placeholder="1234 Main St" value="{{ billing_address_form.address1.value|default:'' }}" required>
+                        <input type="text"
+                                name="address1"
+                                class="form-control"
+                                id="address"
+                                placeholder="1234 Main St"
+                                value="{{ billing_address_form.address1.value|default:'' }}"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            住所は必須です。
+                        </div>
                     </div>
                     
                     <!-- 住所2 -->
@@ -209,18 +263,30 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        <input type="text" class="form-control" id="address2" placeholder="Apartment or suite" value="{{ billing_address_form.address2.value|default:'' }}">
+                        <input type="text"
+                                class="form-control"
+                                id="address2"
+                                placeholder="Apartment or suite"
+                                value="{{ billing_address_form.address2.value|default:'' }}"
+                        >
                     </div>
+                </div>
 
                 <hr class="my-4">
 
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="same-address" name="same_address">
+                    <input type="checkbox"
+                            class="form-check-input"
+                            id="same-address"
+                            name="same_address">
                     <label class="form-check-label" for="same-address">Shipping address is the same as my billing address</label>
                 </div>
 
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="save-info" name="next_save">
+                    <input type="checkbox"
+                            class="form-check-input"
+                            id="save-info"
+                            name="next_save">
                     <label class="form-check-label" for="save-info">Save this information for next time</label>
                 </div>
 
@@ -249,13 +315,33 @@
                     <!-- カード名義 -->
                     <div class="col-md-6">
                         <label for="cc-name" class="form-label">カード名義</label>
-                        <input type="text" name="card_holder" class="form-control" id="cc-name" placeholder="TARO YAMADA" value="{{ payment_form.card_holder.value|default:'' }}" required>
+                        <input type="text"
+                                name="card_holder"
+                                class="form-control"
+                                id="cc-name"
+                                placeholder="TARO YAMADA"
+                                value="{{ payment_form.card_holder.value|default:'' }}"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            カード名義は必須です。
+                        </div>
                     </div>
                     
                     <!-- カード番号 -->
                     <div class="col-md-6">
                         <label for="cc-number" class="form-label">カード番号</label>
-                        <input type="text" name="card_number" class="form-control" id="cc-number" value="{{ payment_form.card_number.value|default:'' }}" placeholder="1111-2222-3333-4444" required>
+                        <input type="text"
+                                name="card_number"
+                                class="form-control"
+                                id="cc-number"
+                                value="{{ payment_form.card_number.value|default:'' }}"
+                                placeholder="1111-2222-3333-4444"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            カード番号は必須です。
+                        </div>
                     </div>
                     
                     {% if payment_form.expiration_date.errors %}
@@ -269,19 +355,39 @@
                     <!-- 有効期限 -->
                     <div class="col-md-4">
                         <label for="cc-expiration" class="form-label">有効期限 (MM/YY)</label>
-                        <input type="text" name="expiration_date" class="form-control me-2" id="cc-expiration-month" placeholder="MM/YY" value="{{ payment_form.expiration_date.value|default:'' }}" maxlength="5" required>
+                        <input type="text"
+                                name="expiration_date"
+                                class="form-control me-2"
+                                id="cc-expiration-month"
+                                placeholder="MM/YY"
+                                value="{{ payment_form.expiration_date.value|default:'' }}"
+                                maxlength="5"
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            有効期限は必須です。
+                        </div>
                     </div>
 
                     <!-- CVV -->
                     <div class="col-md-3">
                         <label for="cc-cvv" class="form-label">CVV</label>
-                        <input type="text" name="cvv" class="form-control" id="cc-cvv" placeholder="" required>
+                        <input type="text"
+                                name="cvv"
+                                class="form-control"
+                                id="cc-cvv"
+                                placeholder=""
+                                required
+                        >
+                        <div class="invalid-feedback">
+                            CVVは必須です。
+                        </div>
                     </div>
                 </div>
 
                 <hr class="my-4">
 
-                <button class="w-100 btn btn-primary btn-lg" type="submit">購入する</button>
+                <button type="submit" class="w-100 btn btn-primary btn-lg">購入する</button>
             </form>
         </div>
         </div>
@@ -296,6 +402,6 @@
         </ul>
     </footer>
     </div>
+    <script src="{% static 'js/country.js' %}"></script>
 </body>
-<script src="{% static 'js/country.js' %}"></script>
-{% endblock %}
+{% endblock content %}

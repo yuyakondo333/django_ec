@@ -1,7 +1,12 @@
+import environ
 from django.db import models
 from datetime import datetime
 from django.core.validators import MinValueValidator
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.core.mail import send_mail
+
+env = environ.Env()
 
 # Create your models here.
 
@@ -51,6 +56,29 @@ class Order(models.Model):
     class Meta:
         db_table = 'order'
 
+    def send_email(self, username, order_id, order_items, total_price, email):
+        # テンプレート側で使えるように必要な情報をcontextに追加
+        context = {
+            "username": username,
+            "order_id": order_id,
+            "order_items": order_items,
+            "total_price": total_price
+        }
+
+        subject = "【購入確定メール】野球魂"
+        text_content = render_to_string("email/order_confirmation.txt", context)  # テキスト版
+        html_content = render_to_string("email/order_confirmation.html", context)  # HTML版
+
+        email = send_mail(
+            subject=subject,
+            message=text_content,
+            from_email=env.str("DEFAULT_FROM_EMAIL"),
+            recipient_list=[email],
+            html_message=html_content, 
+            fail_silently=False,
+        )
+
+        return True
 
 class OrderItem(models.Model):
     order = models.ForeignKey("Order", verbose_name="注文ID", on_delete=models.CASCADE, related_name="order")

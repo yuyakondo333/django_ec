@@ -30,8 +30,8 @@ class BillingAddressForm(forms.ModelForm):
         return first_name
     
     def clean_username(self):
-        username = self.cleaned_data.get("username", "")
-        match_word = r'[0-9a-zA-Zぁ-んァ-ン\u4E00-\u9FFF\u3005-\u3007]+'
+        username = self.cleaned_data.get("username", "").strip()
+        match_word = r'^[0-9a-zA-Zぁ-んァ-ヶー一-龯々〇〻]+(?:[\s　][0-9a-zA-Zぁ-んァ-ヶー一-龯々〇〻]+)*$'
         re_name = re.compile(match_word)
         if username and not re_name.fullmatch(username):
             raise ValidationError("ユーザー名は数字、アルファベット、ひらがな、カタカナ、漢字で入力してください")

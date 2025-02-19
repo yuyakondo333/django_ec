@@ -1,0 +1,14 @@
+{{ username }} 様
+
+この度は「野球魂」にてご購入いただき、誠にありがとうございます。
+
+注文番号: {{ order_id }}
+以下がご購入いただいた商品です:
+
+{% for item in order_items %}
+- {{ item.name }} ({{ item.price }}円) x {{ item.quantity }}個 = {{ item.subtotal }}円
+{% endfor %}
+
+合計金額: {{ total_price }}円
+
+またのご利用を心よりお待ちしております。

@@ -1,8 +1,7 @@
 from django.shortcuts import render, reverse, redirect
 from django.views import View
-from django.views.decorators.http import require_POST
-from cart.models import Cart, CartProduct
-from .models import BillingAddress, Payment, Order, OrderItem
+from cart.models import Cart
+from .models import Order, OrderItem
 from .forms import BillingAddressForm, PaymentForm
 from django.contrib import messages
 from django.db import transaction
@@ -37,7 +36,6 @@ class OrderView(View):
         
         # どちらかがエラーの場合、エラーメッセージと共に元の画面へリダイレクト
         if not billing_address_form.is_valid() or not payment_form.is_valid():
-        # if not billing_address_form.is_valid():
             messages.error(request, "入力に間違いがあります")
             return render(request, "cart/cart_page.html", {
                 "billing_address_form": billing_address_form,
@@ -66,6 +64,15 @@ class OrderView(View):
                     price=product_info["price"],
                     quantity=product_info["quantity"],
                     subtotal=product_info["subtotal"]
+                )
+            # メールを設定していたらメール送信
+            if billing_address.email:
+                order.send_email(
+                    username=billing_address.username,
+                    order_id=order.id,
+                    order_items=product_data,
+                    total_price=sum(item["subtotal"] for item in product_data.values()),
+                    email=billing_address.email
                 )
             # カートを削除
             Cart.objects.filter(id=cart.id).delete()
