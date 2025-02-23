@@ -60,7 +60,7 @@
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-danger" role="alert">
-                        {{ message }}
+                        {{ message|safe }}
                     </div>
                 {% endfor %}
             {% endif %}
@@ -72,13 +72,6 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label for="username" class="form-label">ユーザー名</label>
-                        {% if billing_address_form.username.errors %}
-                            <div class="alert alert-danger">
-                                {% for error in billing_address_form.username.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                         <div class="input-group has-validation">
                             <span class="input-group-text">@</span>
                             <input type="text"
@@ -86,27 +79,9 @@
                                     class="form-control" 
                                     value="{{ billing_address_form.username.value|default:'' }}"
                                     placeholder="ユーザー名"
-                                    required
                             >
-                            <div class="invalid-feedback">
-                                ユーザー名は必須です。
-                            </div>
                         </div>
                     </div>
-
-                    <!-- 姓名のエラーメッセージ -->
-                    {% if billing_address_form.last_name.errors or billing_address_form.first_name.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in billing_address_form.last_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                        <div class="alert alert-danger">
-                            {% for error in billing_address_form.first_name.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
 
                     <!-- 姓 -->
                     <div class="col-sm-6">
@@ -117,11 +92,7 @@
                                 id="lastName"
                                 placeholder="山田"
                                 value="{{ billing_address_form.last_name.value|default:'' }}"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            姓は必須です。
-                        </div>
                     </div>
                     
                     <!-- 名 -->
@@ -133,23 +104,12 @@
                                 id="firstName"
                                 placeholder="太郎"
                                 value="{{ billing_address_form.first_name.value|default:'' }}"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            名は必須です。
-                        </div>
                     </div>
                     
                     <!-- メールアドレス -->
                     <div class="col-12">
                         <label for="email" class="form-label">メールアドレス <span class="text-body-secondary">(任意)</span></label>
-                        {% if billing_address_form.email.errors %}
-                            <div class="alert alert-danger">
-                                {% for error in billing_address_form.email.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                         <input type="email"
                                 name="email"
                                 class="form-control"
@@ -159,20 +119,6 @@
                         >
                     </div>
                     
-                    <!-- 国,州/県のエラーメッセージ -->
-                    {% if billing_address_form.country.errors or billing_address_form.state_prefecture.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in billing_address_form.country.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                        <div class="alert alert-danger">
-                            {% for error in billing_address_form.state_prefecture.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
                     <!-- 国 -->
                     <div class="col-md-6">
                         <label for="country" class="form-label">国</label>
@@ -180,12 +126,9 @@
                                 id="country"
                                 name="country"
                                 data-selected="{{ billing_address_form.country.value|default:'' }}"
-                                required>
+                        >
                             <option value="">Choose...</option>
                         </select>
-                        <div class="invalid-feedback">
-                            国の選択は必須です。
-                        </div>
                     </div>
                     
                     <!-- 州/県 -->
@@ -195,12 +138,9 @@
                                 id="state_prefecture"
                                 name="state_prefecture"
                                 data-selected="{{ billing_address_form.state_prefecture.value|default:'' }}"
-                                required>
+                        >
                             <option value="">Choose a country first...</option>
                         </select>
-                        <div class="invalid-feedback">
-                            州/県の選択は必須です。
-                        </div>
                     </div>
                     
                     <!-- 郵便番号 -->
@@ -208,27 +148,15 @@
                         <div class="d-flex align-items-end">
                             <div class="me-2">
                                 <label for="zip" class="form-label">郵便番号 <span>（ハイフンなし）</span></label>
-                                {% if billing_address_form.zip.errors %}
-                                    <div class="alert alert-danger">
-                                        {% for error in billing_address_form.zip.errors %}
-                                            <p>{{ error }}</p>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
                                 <input type="text"
                                         name="zip"
                                         class="form-control"
                                         id="zip"
                                         inputmode="numeric"
-                                        pattern="\d{7}"
                                         maxlength="7"
                                         placeholder="0001111"
                                         value="{{ billing_address_form.zip.value|default:'' }}"
-                                        required
                                 >
-                                <div class="invalid-feedback">
-                                    郵便番号は必須です
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -236,36 +164,18 @@
                     <!-- 住所1 -->
                     <div class="col-12 mb-2">
                         <label for="address" class="form-label">住所</label>
-                        {% if billing_address_form.address1.errors %}
-                            <div class="alert alert-danger">
-                                {% for error in billing_address_form.address1.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                         <input type="text"
                                 name="address1"
                                 class="form-control"
                                 id="address"
                                 placeholder="1234 Main St"
                                 value="{{ billing_address_form.address1.value|default:'' }}"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            住所は必須です。
-                        </div>
                     </div>
                     
                     <!-- 住所2 -->
                     <div class="col-12">
                         <label for="address2" name="address2" class="form-label">アパート、マンション、部屋番号<span class="text-body-secondary">(任意)</span></label>
-                        {% if billing_address_form.address2.errors %}
-                            <div class="alert alert-danger">
-                                {% for error in billing_address_form.address2.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                         <input type="text"
                                 class="form-control"
                                 id="address2"
@@ -300,20 +210,6 @@
                     <small>※クレジットカードのみお支払い可能です</small>
                 </div>
 
-                <!-- カード名義,番号エラーメッセージ -->
-                {% if payment_form.card_holder.errors or payment_form.card_number.errors %}
-                    <div class="alert alert-danger">
-                        {% for error in payment_form.card_holder.errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    <div class="alert alert-danger">
-                        {% for error in payment_form.card_number.errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
                 <div class="row gy-3">
                     <!-- カード名義 -->
                     <div class="col-md-6">
@@ -324,11 +220,7 @@
                                 id="cc-name"
                                 placeholder="TARO YAMADA"
                                 value="{{ payment_form.card_holder.value|default:'' }}"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            カード名義は必須です。
-                        </div>
                     </div>
                     
                     <!-- カード番号 -->
@@ -339,25 +231,12 @@
                                 class="form-control"
                                 id="cc-number"
                                 inputmode="numeric"
-                                pattern="\d{13,19}"
                                 maxlength="19"
                                 value="{{ payment_form.card_number.value|default:'' }}"
                                 placeholder="1111 2222 3333 4444"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            カード番号は必須です。
-                        </div>
                     </div>
                     
-                    {% if payment_form.expiration_date.errors %}
-                    <div class="alert alert-danger">
-                        {% for error in payment_form.expiration_date.errors %}
-                        <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
                     <!-- 有効期限 -->
                     <div class="col-md-4">
                         <label for="cc-expiration" class="form-label">有効期限 (MM/YY)</label>
@@ -368,11 +247,7 @@
                                 placeholder="MM/YY"
                                 value="{{ payment_form.expiration_date.value|default:'' }}"
                                 maxlength="5"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            有効期限は必須です。
-                        </div>
                     </div>
 
                     <!-- CVV -->
@@ -383,14 +258,9 @@
                                 class="form-control"
                                 id="cc-cvv"
                                 placeholder="000"
-                                pattern="\d{3,4}"
                                 maxlength="4"
                                 inputmode="numeric"
-                                required
                         >
-                        <div class="invalid-feedback">
-                            CVVは必須です。
-                        </div>
                     </div>
                 </div>
 

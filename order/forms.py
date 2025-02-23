@@ -18,7 +18,7 @@ class BillingAddressForm(forms.ModelForm):
         match_word = r'[a-zA-Zぁ-んァ-ン\u4E00-\u9FFF\u3005-\u3007]+'
         re_name = re.compile(match_word)
         if last_name and not re_name.fullmatch(last_name):
-            raise ValidationError("姓はアルファベット、ひらがな、カタカナ、漢字で入力してください")
+            self.add_error("last_name", "姓はアルファベット、ひらがな、カタカナ、漢字で入力してください")
         return last_name
     
     def clean_first_name(self):
@@ -26,7 +26,7 @@ class BillingAddressForm(forms.ModelForm):
         match_word = r'[a-zA-Zぁ-んァ-ン\u4E00-\u9FFF\u3005-\u3007]+'
         re_name = re.compile(match_word)
         if first_name and not re_name.fullmatch(first_name):
-            raise ValidationError("名はアルファベット、ひらがな、カタカナ、漢字で入力してください")
+            self.add_error("first_name","名はアルファベット、ひらがな、カタカナ、漢字で入力してください")
         return first_name
     
     def clean_username(self):
@@ -34,7 +34,7 @@ class BillingAddressForm(forms.ModelForm):
         match_word = r'^[0-9a-zA-Zぁ-んァ-ヶー一-龯々〇〻]+(?:[\s　][0-9a-zA-Zぁ-んァ-ヶー一-龯々〇〻]+)*$'
         re_name = re.compile(match_word)
         if username and not re_name.fullmatch(username):
-            raise ValidationError("ユーザー名は数字、アルファベット、ひらがな、カタカナ、漢字で入力してください")
+            self.add_error("username", "ユーザー名は数字、アルファベット、ひらがな、カタカナ、漢字で入力してください")
         return username
 
     # メールアドレスのチェック
@@ -48,7 +48,7 @@ class BillingAddressForm(forms.ModelForm):
         
         # 「.com」,「.jp」で終わるメールアドレス以外はエラーを返す
         if not email.endswith((".com", ".jp")):
-            raise forms.ValidationError('メールアドレスは「.com」「.jp」で終わるメールアドレスにしてください')
+            self.add_error("email", 'メールアドレスは「.com」「.jp」で終わるメールアドレスにしてください')
         return email
 
     # 郵便番号のチェック
@@ -57,7 +57,7 @@ class BillingAddressForm(forms.ModelForm):
         match_word = r'^[0-9]{7}$'
         re_zip = re.compile(match_word)
         if zip_code and not re_zip.fullmatch(zip_code):
-            raise forms.ValidationError("郵便番号は7桁の数字で入力してください")
+            self.add_error("zip", "郵便番号は7桁の数字で入力してください")
         return zip_code
 
 
@@ -85,16 +85,16 @@ class PaymentForm(forms.ModelForm):
         # 入力した番号に「-」が含まれている場合は "" にreplace
         card_number = self.cleaned_data.get("card_number").replace("/", "")
         if not card_number:
-            raise ValidationError("カード番号を入力してください")
+            self.add_error("card_number", "カード番号を入力してください")
         # 入力内容が数字だけか isdigit() でチェック→数字以外が入っていたらエラー
         if not card_number.isdigit():
-            raise ValidationError("カード番号は数字を入力してください")
+            self.add_error("card_number", "カード番号は数字を入力してください")
         # 数字が14~16桁かチェック→それ以外でエラー
         if not (14 <= len(card_number) <= 16):
-            raise ValidationError("カード番号は14~16桁で入力してください")
+            self.add_error("card_number", "カード番号は14~16桁で入力してください")
         # Luhnアルゴリズムでカード番号の妥当性をチェック
         if not self.is_luhn_valid(card_number):
-            raise ValidationError("無効なカード番号です。")
+            self.add_error("card_number", "無効なカード番号です")
         # バリデーションチェックされたカード番号を返す
         return card_number
         
@@ -140,7 +140,7 @@ class PaymentForm(forms.ModelForm):
         expiry = self.cleaned_data.get("expiration_date", "").replace("/", "")
         # 4桁でなければバリデーションエラーを返す
         if len(expiry) != 4 or not expiry.isdigit():
-            raise ValidationError("有効期限は「MM/YY」の形式で入力してください")
+            self.add_error("expiration_date", "有効期限は「MM/YY」の形式で入力してください")
         
         # 1,2文字目を格納 etc:05,11
         expiry_month = int(expiry[:2])
@@ -156,19 +156,19 @@ class PaymentForm(forms.ModelForm):
 
         # 有効期限の月が1~12以外でエラー
         if not (1 <= expiry_month <= 12):
-            raise ValidationError("有効期限の月が無効です")
+            self.add_error("expiration_date", "有効期限の月が無効です")
         
         # 有効期限の月と現在の月の差が0より小さい and 有効期限の年と現在の年が同じでエラー
         if expiry_month < current_month and expiry_year == current_year:
-            raise ValidationError("有効期限が切れています")
+            self.add_error("expiration_date", "有効期限が切れています")
 
         # 過去の年はエラー
         if expiry_year < current_year:
-            raise ValidationError("有効期限が切れています")
+            self.add_error("expiration_date", "有効期限が切れています")
         
         # 有効期限の年が未来すぎる場合エラー
         if expiry_year - current_year > 8:
-            raise ValidationError("有効期限の年が未来すぎです")
+            self.add_error("expiration_date", "有効期限の年が未来すぎです")
         
         # 最後に文字列として返す
         return f"{expiry_month:02}/{expiry_year:02}"

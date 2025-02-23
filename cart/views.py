@@ -8,6 +8,7 @@ from django.views.generic.edit import DeleteView
 from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
+from order.forms import BillingAddressForm, PaymentForm
 
 # Create your views here.
 class CartPageView(ListView):
@@ -33,10 +34,24 @@ class CartPageView(ListView):
             product_data[product_name]["id"] = cart_product.id
             product_data[product_name]["price"] = cart_product.product.price
             product_data[product_name]["quantity"] += cart_product.quantity
+        
+        # セッションに保存されたデータがあれば取得（エラー時のフォームデータ復元）
+        billing_address_data = self.request.session.pop("billing_address_form_data", None)
+        payment_data = self.request.session.pop("payment_form_data", None)
 
-        context["total_type_products"] = total_type_products
-        context["total_cart_price"] = total_cart_price
-        context["product_data"] = dict(product_data)
+        # フォームの初期値を設定
+        context["billing_address_form"] = BillingAddressForm(initial=billing_address_data if billing_address_data else {})
+        context["payment_form"] = PaymentForm(initial=payment_data if payment_data else {})
+        context["total_type_products"] = len(cart_products)
+        context["total_cart_price"] = cart.total_price
+        context["product_data"] = {
+            cart_product.product.name: {
+                "subtotal": cart_product.sub_total_price(),
+                "id": cart_product.id,
+                "price": cart_product.product.price,
+                "quantity": cart_product.quantity,
+            } for cart_product in cart_products
+        }
         return context
 
 

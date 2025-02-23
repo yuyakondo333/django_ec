@@ -9,10 +9,8 @@ from django.db import transaction
 # Create your views here.
 class OrderView(View):
     def post(self, request):
-        # 請求先住所フォームと支払いフォームを生成
         billing_address_form = BillingAddressForm(request.POST)
         payment_form = PaymentForm(request.POST)
-        # カートIDを取得、ない場合エラーを返してリダイレクト
         cart = Cart.get_or_create_cart(self.request)
         cart_products = cart.cart_products.select_related("product")
 
@@ -22,6 +20,18 @@ class OrderView(View):
                 "billing_address_form": billing_address_form,
                 "payment_form": payment_form,
             })
+        
+        error_messages = []
+        for field, errors in billing_address_form.errors.items():
+            for error in errors:
+                error_messages.append(f"{billing_address_form[field].label}: {error}")
+        
+        for field, errors in payment_form.errors.items():
+            for error in errors:
+                error_messages.append(f"{payment_form[field].label}: {error}")
+
+        request.session["billing_address_form_data"] = request.POST.dict()
+        request.session["payment_form_data"] = request.POST.dict()
 
         # エラーになった際にカート内の商品情報を保持すための処理
         product_data = {}
@@ -35,15 +45,11 @@ class OrderView(View):
             }
         
         # どちらかがエラーの場合、エラーメッセージと共に元の画面へリダイレクト
-        if not billing_address_form.is_valid() or not payment_form.is_valid():
-            messages.error(request, "入力に間違いがあります")
-            return render(request, "cart/cart_page.html", {
-                "billing_address_form": billing_address_form,
-                "payment_form": payment_form,
-                "product_data": product_data,
-                "total_cart_price": cart.total_price,
-                "total_type_products": len(product_data),
-            })
+        if error_messages:
+            for message in error_messages:
+                messages.error(request, message)
+
+            return redirect(reverse("cart:cart_page"))
         
         # トランザクション内でDB処理を一括実行
         with transaction.atomic():
