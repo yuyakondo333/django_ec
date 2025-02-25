@@ -46,8 +46,8 @@
           <i class="bi-cart-fill me-1"></i>
           カート
           <span class="badge bg-dark text-white ms-1 rounded-pill">
-          {% if request.session.cart_total %}
-              {{ request.session.cart_total }}
+          {% if cart_total %}
+              {{ cart_total }}
           {% else %}
               0
           {% endif %}

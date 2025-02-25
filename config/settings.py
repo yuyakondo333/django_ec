@@ -30,8 +30,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'custom_admin.apps.CustomAdminConfig',
+    'anymail',
     'products.apps.ProductsConfig',
     'cart.apps.CartConfig',
+    'order.apps.OrderConfig',
     'cloudinary',
     'cloudinary_storage',
 ]
@@ -145,3 +147,11 @@ LOGOUT_REDIRECT_URL='/admin/login'
 MIGRATION_MODULES = {
     'custom_admin': None,
 }
+
+# メール送信の環境変数
+EMAIL_HOST = env.str("EMAIL_HOST")
+EMAIL_PORT = env.int("EMAIL_PORT")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
+EMAIL_HOST_USER = env.str("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")

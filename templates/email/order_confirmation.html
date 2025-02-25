@@ -1,0 +1,16 @@
+<p>{{ username }} 様</p>
+
+<p>この度は「野球魂」にてご購入いただき、誠にありがとうございます。</p>
+
+<p><strong>注文番号:</strong> {{ order_id }}</p>
+
+<p>以下がご購入いただいた商品です:</p>
+<ul>
+    {% for item_name, item in order_items.items %}
+    <li>{{ item_name }} ({{ item.price }}円) × {{ item.quantity }}個 = {{ item.subtotal }}円</li>
+    {% endfor %}
+</ul>
+
+<p><strong>合計金額:</strong> {{ total_price }}円</p>
+
+<p>またのご利用を心よりお待ちしております。</p>

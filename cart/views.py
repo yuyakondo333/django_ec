@@ -8,6 +8,7 @@ from django.views.generic.edit import DeleteView
 from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
+from order.forms import BillingAddressForm, PaymentForm
 
 # Create your views here.
 class CartPageView(ListView):
@@ -19,25 +20,38 @@ class CartPageView(ListView):
         # カートオブジェクトを取得
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
-        cart_products = cart.cart_products.all()
         cart_products = cart.cart_products.select_related("product")
         # 何種類の商品が追加されたか
         total_type_products = len(cart_products)
         # カート内の全商品の合計金額
         total_cart_price = cart.total_price
         # 商品名ごと辞書で格納（デフォルト0に設定）
-        product_data = defaultdict(lambda: {"total_price": 0, "quantity": 0})
+        product_data = defaultdict(lambda: {"subtotal": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
         for cart_product in cart_products:
             product_name = cart_product.product.name
-            product_data[product_name]["total_price"] += cart_product.sub_total_price
+            product_data[product_name]["subtotal"] += cart_product.sub_total_price()
             product_data[product_name]["id"] = cart_product.id
             product_data[product_name]["price"] = cart_product.product.price
             product_data[product_name]["quantity"] += cart_product.quantity
+        
+        # セッションに保存されたデータがあれば取得（エラー時のフォームデータ復元）
+        billing_address_data = self.request.session.pop("billing_address_form_data", None)
+        payment_data = self.request.session.pop("payment_form_data", None)
 
-        context["total_type_products"] = total_type_products
-        context["total_cart_price"] = total_cart_price
-        context["product_data"] = dict(product_data)
+        # フォームの初期値を設定
+        context["billing_address_form"] = BillingAddressForm(initial=billing_address_data if billing_address_data else {})
+        context["payment_form"] = PaymentForm(initial=payment_data if payment_data else {})
+        context["total_type_products"] = len(cart_products)
+        context["total_cart_price"] = cart.total_price
+        context["product_data"] = {
+            cart_product.product.name: {
+                "subtotal": cart_product.sub_total_price(),
+                "id": cart_product.id,
+                "price": cart_product.product.price,
+                "quantity": cart_product.quantity,
+            } for cart_product in cart_products
+        }
         return context
 
 
@@ -57,18 +71,13 @@ class AddToCartView(TemplateView):
         product = get_object_or_404(Product, id=product_id)
 
         """
-        詳細画面から個数指定された際に
-        request.POST.get()でname="num"となっているinputタグから取得
-        index,reletedはtype="hidden" name="num" value="1" に設定して
-        「Add to cart」をクリックした際は value の1を使用
+        詳細画面から個数指定された際にrequest.POST.get()でname="num"となっているinputタグから取得
+        index,reletedはtype="hidden" name="num" value="1" に設定して「Add to cart」をクリックした際は value の1を使用
         フォームのデータ型は文字列。整数を扱いたいからint型に変換
         """
-        num = request.POST.get("num", "1")
-        num = int(num)
+        num = int(request.POST.get("num", "1"))
         # カート内の商品を取得または作成
         cart.add_product(product, num)
-        # カート内の合計個数をセッションに保存
-        request.session["cart_total"] = cart.total_quantity()
         # カート追加時のメッセージ
         messages.success(request, f'{product.name}をカートに追加しました')
         # レスポンスで元いたページに戻る
@@ -79,7 +88,6 @@ class DeleteToCartView(DeleteView):
     template_name = 'cart/delete.html'
     model = CartProduct
     context_object_name = 'cart_product'
-    print(context_object_name)
     success_url = reverse_lazy('cart:cart_page')
 
     def get_context_data(self, **kwargs):
