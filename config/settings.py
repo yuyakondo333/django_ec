@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'order.apps.OrderConfig',
     'cloudinary',
     'cloudinary_storage',
+    'promotion_code',
 ]
 
 MIDDLEWARE = [
