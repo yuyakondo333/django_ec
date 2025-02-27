@@ -15,7 +15,8 @@ def promotion_code_generate():
 # 各プロモーションコードに割引額を当てはめる ¥100~¥1,000
 def generate_discount(promotion_code_list):
     discount_list = list(range(100, 1001, 100))
-    discount_dict = {}
+    # 初期値として NO_PROMO_CODE を追加（デフォルトで0）
+    discount_dict = {"NOTHING": 0}
 
     for promotion_code in promotion_code_list:
         discount_dict[promotion_code] = random.choice(discount_list)
@@ -48,5 +49,5 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(error_message))
 
         except Exception as e:
-            error_msg = f"不明なエラーが発生しました: {str(e)}"
+            error_message = f"不明なエラーが発生しました: {str(e)}"
             self.stderr.write(self.style.ERROR(error_message))
