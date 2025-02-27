@@ -9,6 +9,7 @@ from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
 from order.forms import BillingAddressForm, PaymentForm
+from promotion_code.models import PromotionCode
 
 # Create your views here.
 class CartPageView(ListView):
@@ -21,10 +22,10 @@ class CartPageView(ListView):
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.select_related("product")
-        # 何種類の商品が追加されたか
-        total_type_products = len(cart_products)
-        # カート内の全商品の合計金額
-        total_cart_price = cart.total_price
+        # セッションに保存された割引額を取得
+        discount = self.request.session.get("discount", 0)
+        # カート内の全商品の合計金額でプロモーションコードがあったら割引を適用
+        total_cart_price = cart.total_price - discount if discount else cart.total_price
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"subtotal": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -43,7 +44,8 @@ class CartPageView(ListView):
         context["billing_address_form"] = BillingAddressForm(initial=billing_address_data if billing_address_data else {})
         context["payment_form"] = PaymentForm(initial=payment_data if payment_data else {})
         context["total_type_products"] = len(cart_products)
-        context["total_cart_price"] = cart.total_price
+        context["total_cart_price"] = total_cart_price
+        context["discount"] = discount
         context["product_data"] = {
             cart_product.product.name: {
                 "subtotal": cart_product.sub_total_price(),
@@ -98,3 +100,30 @@ class DeleteToCartView(DeleteView):
         context["quantity"] = cart_product.quantity
 
         return context
+
+
+class UseToPromotionCodeView(TemplateView):
+    def post(self, request, **kwargs):
+        cart = Cart.get_or_create_cart(self.request)
+        cart_products = cart.cart_products.select_related("product")
+        promotion_code = self.request.POST['promotion_code']
+
+        # カート内に商品がない場合はバリデーションエラーを返す
+        if not cart_products:
+            messages.error(request, "カート内に商品がありません")
+            return redirect(reverse("cart:cart_page"))
+        
+        try:
+            promotion_code = PromotionCode.objects.get(promo_code=promotion_code)
+        except PromotionCode.DoesNotExist:
+            messages.error(request, "このプロモーションコードはありません")
+            return redirect(reverse("cart:cart_page"))
+
+        # 取得したプロモーションコードのis_usedカラムがTrueになっていたらバリデーションエラーを返す
+        if promotion_code.is_used:
+            messages.error(request, "このプロモーションコードは使えません")
+            return redirect(reverse("cart:cart_page"))
+        
+        # 取得した割引額をセッションに保存
+        request.session["discount"] = promotion_code.discount
+        return redirect(reverse("cart:cart_page"))
