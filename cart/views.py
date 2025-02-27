@@ -22,10 +22,18 @@ class CartPageView(ListView):
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.select_related("product")
-        # セッションに保存された割引額を取得
-        discount = self.request.session.get("discount", 0)
-        # カート内の全商品の合計金額でプロモーションコードがあったら割引を適用
-        total_cart_price = cart.total_price - discount if discount else cart.total_price
+        # プロモーションコードなしの場合の固定値定義
+        no_promo_code = "NOTHING"
+        # セッションに保存されたプロモーションコードを取得
+        promotion_code = self.request.session.get("promotion_code")
+        if promotion_code and promotion_code[1] != no_promo_code:
+            # 割引額を取得
+            discount = promotion_code[2]
+            # 合計金額 - 割引額
+            total_cart_price = cart.total_price - discount
+        else:
+            discount = 0
+            total_cart_price = cart.total_price
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"subtotal": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -46,6 +54,7 @@ class CartPageView(ListView):
         context["total_type_products"] = len(cart_products)
         context["total_cart_price"] = total_cart_price
         context["discount"] = discount
+        context["promotion_code"] = promotion_code
         context["product_data"] = {
             cart_product.product.name: {
                 "subtotal": cart_product.sub_total_price(),
@@ -124,6 +133,27 @@ class UseToPromotionCodeView(TemplateView):
             messages.error(request, "このプロモーションコードは使えません")
             return redirect(reverse("cart:cart_page"))
         
-        # 取得した割引額をセッションに保存
-        request.session["discount"] = promotion_code.discount
+        # 取得したプロモーションコードと割引額をセッションに保存
+        request.session["promotion_code"] = (
+            promotion_code.id,
+            promotion_code.promo_code,
+            promotion_code.discount
+        )
+        return redirect(reverse("cart:cart_page"))
+
+
+class DeleteToPromotionCodeView(TemplateView):
+    template_name = 'cart/promotion_code_delete.html'
+    success_url = reverse_lazy('cart:cart_page')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        promotion_code = self.request.session["promotion_code"]
+        context["promotion_code"] = promotion_code[1]
+        context["discount"] = promotion_code[2]
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.request.session["promotion_code"] = (1, "NOTHING", 0)
         return redirect(reverse("cart:cart_page"))
