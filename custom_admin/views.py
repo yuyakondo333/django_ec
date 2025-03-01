@@ -104,7 +104,7 @@ class AdminOrderDetailView(ListView):
     def get_queryset(self):
         order_id = self.kwargs.get('pk')    # URLから注文IDを取得
         # order_idに紐づく購入商品を取得し、関連する請求先住所も取得
-        return OrderItem.objects.select_related('order__billing_address').filter(order_id=order_id).order_by('-id')
+        return OrderItem.objects.select_related('order__billing_address', 'order__promo_code').filter(order_id=order_id).order_by('-id')
     
     # コンテキストデータを設定するメソッドを定義
     def get_context_data(self, **kwargs):
@@ -113,10 +113,12 @@ class AdminOrderDetailView(ListView):
         order_items = self.get_queryset()   # クエリセット(購入商品一覧)を取得
         # 最初の購入商品からユーザー名を取得(購入商品があれば)
         username = order_items[0].order.billing_address.username if order_items else "不明"
+        order = order_items[0].order if order_items else None
+        discount = order.promo_code.discount if order and order.promo_code.id != 1 else 0
 
         context['username'] = username  # ユーザー名をコンテキストに追加
         context['order_id'] = self.kwargs.get('pk')     # 注文IDをコンテキストに追加
         context['total_subtotal'] = sum(order_item.subtotal for order_item in order_items)
-        # context['total_subtotal'] = sum(item.subtotal for item in order_items)
+        context['discount'] = discount
 
         return context

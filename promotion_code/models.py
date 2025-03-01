@@ -14,3 +14,30 @@ class PromotionCode(models.Model):
 
     def __str__(self):
         return f"{self.promo_code} : {self.discount}"
+    
+    # 新しいプロモーションコードを1つ作成
+    @classmethod
+    def new_promotion_code(cls):
+        CODE_LENGTH = 7
+        chars = string.ascii_letters + string.digits
+        promotion_code = ''.join(random.choices(chars, k=CODE_LENGTH))
+        return promotion_code
+    
+    # プロモーションコードに対応する割引額を作成
+    @classmethod
+    def new_discount(cls):
+        discount_list = list(range(100, 1001, 100))
+        new_discount = random.choice(discount_list)
+        return new_discount
+    
+    @classmethod
+    def create_new_promotion_code(cls):
+        promotion_code = cls.new_promotion_code()
+        discount = cls.new_discount()
+
+        new_promo = cls.objects.create(
+            promo_code=promotion_code,
+            discount=discount
+        )
+
+        return new_promo

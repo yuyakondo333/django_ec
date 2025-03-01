@@ -55,12 +55,13 @@ class Order(models.Model):
     class Meta:
         db_table = 'order'
 
-    def send_email(self, username, order_id, order_items, total_price, email):
+    def send_email(self, username, order_id, order_items, discount, total_price, email):
         # テンプレート側で使えるように必要な情報をcontextに追加
         context = {
             "username": username,
             "order_id": order_id,
             "order_items": order_items,
+            "discount": discount,
             "total_price": total_price
         }
 

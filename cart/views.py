@@ -116,10 +116,17 @@ class UseToPromotionCodeView(TemplateView):
         cart = Cart.get_or_create_cart(self.request)
         cart_products = cart.cart_products.select_related("product")
         promotion_code = self.request.POST['promotion_code']
+        applied_promotion_code = self.request.session["promotion_code"]
 
         # カート内に商品がない場合はバリデーションエラーを返す
         if not cart_products:
             messages.error(request, "カート内に商品がありません")
+            return redirect(reverse("cart:cart_page"))
+        
+        # 既にプロモーションコードが適用されている場合はエラーを返す
+        no_promo_code = "NOTHING"
+        if applied_promotion_code and applied_promotion_code[1] != no_promo_code:
+            messages.error(request, "プロモーションコードは1つだけ使用可能です")
             return redirect(reverse("cart:cart_page"))
         
         try:

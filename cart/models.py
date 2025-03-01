@@ -5,7 +5,6 @@ from promotion_code.models import PromotionCode
 # Create your models here.
 class Cart(models.Model):
     session_id = models.CharField(max_length=32, unique=True, default="temp_session_id")
-    promo_code = models.ForeignKey("promotion_code.PromotionCode", verbose_name="プロモーションコードID", on_delete=models.CASCADE, default=1)
 
     class Meta:
         db_table = 'cart'
