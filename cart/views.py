@@ -9,7 +9,8 @@ from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
 from order.forms import BillingAddressForm, PaymentForm
-from promotion_code.models import PromotionCode
+from promotion_code.services.promotion_service import PromotionService
+from django.utils.translation import gettext as _
 
 NO_PROMO_CODE = (1, "NOTHING", 0)
 
@@ -113,48 +114,18 @@ class DeleteToCartView(DeleteView):
 
 class UseToPromotionCodeView(TemplateView):
     def post(self, request, **kwargs):
-        cart = Cart.get_or_create_cart(self.request)
-        cart_products = cart.cart_products.select_related("product")
+        promo_service = PromotionService(request)
 
-        # セッションから適用済みのプロモーションコードを取得
-        applied_promotion_code = self.request.session.get("promotion_code", NO_PROMO_CODE)
-
-        # カート内に商品がない場合はバリデーションエラーを返す
-        if not cart_products:
-            messages.error(request, "カート内に商品がありません")
-            return redirect(reverse("cart:cart_page"))
-        
-        # 既にプロモーションコードが適用されている場合はエラーを返す
-        if applied_promotion_code[1] != NO_PROMO_CODE[1]:
-            messages.error(request, "プロモーションコードは1つだけ使用可能です")
-            return redirect(reverse("cart:cart_page"))
-        
-        # 入力されたプロモーションコードを取得
-        promotion_code = self.request.POST.get("promotion_code")
-        # プロモーションコードが入力されていない場合はバリデーションエラーを返す
-        if not promotion_code:
-            messages.error(request, "プロモーションコードが入力されていません")
-            return redirect(reverse("cart:cart_page"))
-
-        # DBに存在しないプロモーションコードはバリデーションエラーを返す
         try:
-            promotion_code = PromotionCode.objects.get(promo_code=promotion_code)
-        except PromotionCode.DoesNotExist:
-            messages.error(request, "このプロモーションコードは存在しません")
-            return redirect(reverse("cart:cart_page"))
-
-        # 取得したプロモーションコードのis_usedカラムがTrueになっている
-        # 入力値が"NOTHING"だったらバリデーションエラーを返す
-        if promotion_code.is_used and promotion_code == NO_PROMO_CODE[1]:
-            messages.error(request, "このプロモーションコードは使えません")
-            return redirect(reverse("cart:cart_page"))
+            # プロモーションコードを適用
+            promo_service.apply_promotion_code()
+            messages.success(request, _("プロモーションコードが適用されました"))
+        except ValueError as e:
+            messages.error(request, str(e))
         
-        # 取得したプロモーションコードと割引額をセッションに保存
-        request.session["promotion_code"] = (
-            promotion_code.id,
-            promotion_code.promo_code,
-            promotion_code.discount
-        )
+        return self.redirect_to_cart()
+    
+    def redirect_to_cart(self):
         return redirect(reverse("cart:cart_page"))
 
 
