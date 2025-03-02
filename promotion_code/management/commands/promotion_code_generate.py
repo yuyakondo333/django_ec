@@ -15,11 +15,11 @@ def promotion_code_generate():
 # 各プロモーションコードに割引額を当てはめる ¥100~¥1,000
 def generate_discount(promotion_code_list):
     discount_list = list(range(100, 1001, 100))
-    # 初期値として NO_PROMO_CODE を追加（デフォルトで0）
-    discount_dict = {"NOTHING": 0}
+    discount_dict = {}
 
     for promotion_code in promotion_code_list:
         discount_dict[promotion_code] = random.choice(discount_list)
+    
     return discount_dict
 
 class Command(BaseCommand):
@@ -27,6 +27,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
+            # "NOTHING" のプロモーションコードが存在するか確認
+            if not PromotionCode.objects.filter(promo_code="NOTHING").exists():
+                try:
+                    PromotionCode.objects.create(
+                        promo_code="NOTHING",
+                        discount=0
+                    )
+                    self.stdout.write(self.style.SUCCESS("Successfully created 'NOTHING' promo code!"))
+                except IntegrityError:
+                    self.stderr.write(self.style.ERROR("プロモーションコード 'NOTHING' は既に存在しています。"))
+
+            # 通常のプロモーションコードを生成
             promotion_codes = promotion_code_generate()
             discount_mapping = generate_discount(promotion_codes)
 
@@ -38,7 +50,7 @@ class Command(BaseCommand):
                         discount=discount
                     )
                 except IntegrityError:
-                    error_message = f"プロモーションコード'{code}'が重複しているため、保存できませんでした"
+                    error_message = f"プロモーションコード '{code}' が重複しているため、保存できませんでした"
                     self.stderr.write(self.style.ERROR(error_message))
 
             # コンソールにサクセスメッセージを出力
