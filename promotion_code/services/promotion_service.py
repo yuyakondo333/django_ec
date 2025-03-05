@@ -10,10 +10,13 @@ class PromotionService:
 
     def get_promotion_from_session(self):
         """ セッションからプロモーションコードを取得して、DBからID, 割引額を補完 """
-        session_promo = self.request.session.get("promotion_code")
+        session_promo = self.request.session.get("promotion_code", NO_PROMO_CODE)
+
+        # セッションのデータ型を統一
+        session_promo = tuple(session_promo) if isinstance(session_promo, (list, tuple)) else session_promo
 
         # セッションに何も保存されていない場合はNO_PROMO_CODEを返す
-        if not session_promo:
+        if session_promo == NO_PROMO_CODE:
             return NO_PROMO_CODE
         
         # ユーザが入力したプロモーションコードを元にDBから情報を取得
@@ -26,7 +29,7 @@ class PromotionService:
                 return NO_PROMO_CODE
             
         # 既にプロモーションコードが適用されている場合はそのまま返す (id, promo_code, discount)
-        if isinstance(session_promo, (tuple, list)) and len(session_promo) == 3:
+        if session_promo != tuple(NO_PROMO_CODE) and isinstance(session_promo, (tuple, list)) and len(session_promo) == 3:
             return session_promo
         
         # 予期しないデータだったらNO_PROMO_CODEを返す
@@ -70,3 +73,12 @@ class PromotionService:
         """ プロモーションコード削除して初期化 """
         self.request.session["promotion_code"] = NO_PROMO_CODE
 
+    def get_discounted_total(self, cart):
+        """ 割引額を適用した合計金額を計算 """
+        if self.applied_promotion and self.applied_promotion[1] != NO_PROMO_CODE[1]:
+            discount = self.applied_promotion[2]
+            total_cart_price = cart.total_price - discount
+        else:
+            discount = NO_PROMO_CODE[2]
+            total_cart_price = cart.total_price
+        return total_cart_price, discount

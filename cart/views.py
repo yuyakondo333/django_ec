@@ -25,16 +25,11 @@ class CartPageView(ListView):
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.select_related("product")
-        # セッションに保存されたプロモーションコードを取得
-        promotion_code = self.request.session.get("promotion_code")
-        if promotion_code and promotion_code[1] != NO_PROMO_CODE[1]:
-            # 割引額を取得
-            discount = promotion_code[2]
-            # 合計金額 - 割引額
-            total_cart_price = cart.total_price - discount
-        else:
-            discount = 0
-            total_cart_price = cart.total_price
+
+        # PromotionServiceで割引後の価格を取得
+        promo_service = PromotionService(self.request)
+        total_cart_price, discount = promo_service.get_discounted_total(cart)
+        
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"subtotal": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -55,7 +50,7 @@ class CartPageView(ListView):
         context["total_type_products"] = len(cart_products)
         context["total_cart_price"] = total_cart_price
         context["discount"] = discount
-        context["promotion_code"] = promotion_code
+        context["promotion_code"] = promo_service.applied_promotion
         context["product_data"] = {
             cart_product.product.name: {
                 "subtotal": cart_product.sub_total_price(),
@@ -142,5 +137,10 @@ class DeleteToPromotionCodeView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        self.request.session["promotion_code"] = (1, "NOTHING", 0)
+        promo_service = PromotionService(request)
+        promo_service.remove()
+        messages.success(request, _("プロモーションコードを削除しました"))
+        return self.redirect_to_cart()
+
+    def redirect_to_cart(self):
         return redirect(reverse("cart:cart_page"))
