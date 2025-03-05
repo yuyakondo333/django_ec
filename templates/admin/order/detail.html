@@ -22,6 +22,9 @@
     <!-- 注文情報一覧テーブル -->
     <p class="text-start">注文ID: {{ order_id }} </p>
     <p class="text-start">ユーザー名: {{ username }}</p>
+    {% if discount > 0 %}
+        <p class="text-start">割引額(¥): {{ discount }}</p>
+    {% endif %}
     <p class="text-start">合計金額(¥): {{ total_subtotal }}</p>
 
     <table class="table table-striped table-bordered" border="1">

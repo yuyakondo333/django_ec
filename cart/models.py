@@ -1,6 +1,6 @@
 from django.db import models
 from products.models import Product
-from django.core.exceptions import ValidationError
+from promotion_code.models import PromotionCode
 
 # Create your models here.
 class Cart(models.Model):

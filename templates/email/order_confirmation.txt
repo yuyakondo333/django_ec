@@ -6,9 +6,12 @@
 以下がご購入いただいた商品です:
 
 {% for item in order_items %}
-- {{ item.name }} ({{ item.price }}円) x {{ item.quantity }}個 = {{ item.subtotal }}円
+- {{ item.name }} ({{ item.price }}円) x {{ item.quantity }}個 : {{ item.subtotal }}円
 {% endfor %}
 
+{% if discount > 0 %}
+プロモーションコードによる割引額: {{ discount }}
+{% endif %}
 合計金額: {{ total_price }}円
 
 またのご利用を心よりお待ちしております。

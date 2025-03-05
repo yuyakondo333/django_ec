@@ -9,6 +9,10 @@ from .models import Cart, CartProduct
 from products.models import Product
 from .forms import AddToCartForm
 from order.forms import BillingAddressForm, PaymentForm
+from promotion_code.services.promotion_service import PromotionService
+from django.utils.translation import gettext as _
+
+NO_PROMO_CODE = (1, "NOTHING", 0)
 
 # Create your views here.
 class CartPageView(ListView):
@@ -21,10 +25,11 @@ class CartPageView(ListView):
         cart = Cart.get_or_create_cart(self.request)
         # カートオブジェクトを元にカート内の商品を取得
         cart_products = cart.cart_products.select_related("product")
-        # 何種類の商品が追加されたか
-        total_type_products = len(cart_products)
-        # カート内の全商品の合計金額
-        total_cart_price = cart.total_price
+
+        # PromotionServiceで割引後の価格を取得
+        promo_service = PromotionService(self.request)
+        total_cart_price, discount = promo_service.get_discounted_total(cart)
+        
         # 商品名ごと辞書で格納（デフォルト0に設定）
         product_data = defaultdict(lambda: {"subtotal": 0, "quantity": 0})
         # 商品名ごとの合計金額を→オブジェクトリストをfor文で回して
@@ -43,7 +48,9 @@ class CartPageView(ListView):
         context["billing_address_form"] = BillingAddressForm(initial=billing_address_data if billing_address_data else {})
         context["payment_form"] = PaymentForm(initial=payment_data if payment_data else {})
         context["total_type_products"] = len(cart_products)
-        context["total_cart_price"] = cart.total_price
+        context["total_cart_price"] = total_cart_price
+        context["discount"] = discount
+        context["promotion_code"] = promo_service.applied_promotion
         context["product_data"] = {
             cart_product.product.name: {
                 "subtotal": cart_product.sub_total_price(),
@@ -85,7 +92,7 @@ class AddToCartView(TemplateView):
 
 
 class DeleteToCartView(DeleteView):
-    template_name = 'cart/delete.html'
+    template_name = 'cart/product_delete.html'
     model = CartProduct
     context_object_name = 'cart_product'
     success_url = reverse_lazy('cart:cart_page')
@@ -98,3 +105,42 @@ class DeleteToCartView(DeleteView):
         context["quantity"] = cart_product.quantity
 
         return context
+
+
+class UseToPromotionCodeView(TemplateView):
+    def post(self, request, **kwargs):
+        promo_service = PromotionService(request)
+
+        try:
+            # プロモーションコードを適用
+            promo_service.apply_promotion_code()
+            messages.success(request, _("プロモーションコードが適用されました"))
+        except ValueError as e:
+            messages.error(request, str(e))
+        
+        return self.redirect_to_cart()
+    
+    def redirect_to_cart(self):
+        return redirect(reverse("cart:cart_page"))
+
+
+class DeleteToPromotionCodeView(TemplateView):
+    template_name = 'cart/promotion_code_delete.html'
+    success_url = reverse_lazy('cart:cart_page')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        promotion_code = self.request.session["promotion_code"]
+        context["promotion_code"] = promotion_code[1]
+        context["discount"] = promotion_code[2]
+        return context
+
+    def post(self, request, *args, **kwargs):
+        promo_service = PromotionService(request)
+        promo_service.remove()
+        messages.success(request, _("プロモーションコードを削除しました"))
+        return self.redirect_to_cart()
+
+    def redirect_to_cart(self):
+        return redirect(reverse("cart:cart_page"))

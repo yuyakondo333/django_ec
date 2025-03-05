@@ -1,8 +1,6 @@
 import environ
 from django.db import models
-from datetime import datetime
 from django.core.validators import MinValueValidator
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 
@@ -51,17 +49,19 @@ class Payment(models.Model):
 class Order(models.Model):
     billing_address = models.ForeignKey("BillingAddress", verbose_name="配送先ID", on_delete=models.CASCADE, related_name="billing_address")
     payment = models.ForeignKey("Payment", verbose_name="支払いID", on_delete=models.CASCADE)
+    promo_code = models.ForeignKey("promotion_code.PromotionCode", verbose_name="プロモーションコードID", on_delete=models.CASCADE, default=1)
     created_at = models.DateTimeField("購入日時", auto_now_add=True)
 
     class Meta:
         db_table = 'order'
 
-    def send_email(self, username, order_id, order_items, total_price, email):
+    def send_email(self, username, order_id, order_items, discount, total_price, email):
         # テンプレート側で使えるように必要な情報をcontextに追加
         context = {
             "username": username,
             "order_id": order_id,
             "order_items": order_items,
+            "discount": discount,
             "total_price": total_price
         }
 
